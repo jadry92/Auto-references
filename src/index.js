@@ -1,10 +1,12 @@
 const { log } = require('console');
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+const { scrapingData } = require('./scraping');
 
 function setMainIpc(mainWindow) {
-  ipcMain.on('submit-form', (e, data) => {
-    log(e, data);
+  ipcMain.on('submit-form', async (event, links) => {
+    const dataURLs = await scrapingData(links)
+    await event.sender.send('scraping-data', dataURLs)
   })
 }
 
@@ -18,7 +20,9 @@ const createWindow = () => {
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 800,
-    nodeIntegration: true
+    webPreferences: {
+      nodeIntegration: true
+    }
   });
   // Set communication IPC
   setMainIpc(mainWindow);
