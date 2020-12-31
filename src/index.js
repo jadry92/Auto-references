@@ -1,7 +1,10 @@
-const { log } = require('console');
-const { app, BrowserWindow, ipcMain } = require('electron');
+// electron imports
+const { app, BrowserWindow, ipcMain, nativeTheme } = require('electron');
+// node imports
 const path = require('path');
+// local imports
 const { scrapingData } = require('./scraping');
+
 
 function setMainIpc(mainWindow) {
   ipcMain.on('submit-form', async (event, links) => {
@@ -24,9 +27,12 @@ const createWindow = () => {
       nodeIntegration: true
     }
   });
+
+  if (process.platform === 'darwin') {
+    mainWindow.defaultTheme = 'light'
+  }
   // Set communication IPC
   setMainIpc(mainWindow);
-
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, 'renderer/scrapping-win/index.html'));
 

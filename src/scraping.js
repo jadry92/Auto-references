@@ -1,6 +1,7 @@
 const fetch = require("node-fetch");
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
+
 // regexps
 const titleRegex = /^.+\s[\|\-\.]\s([\w\s]{4,30})$/g;
 const yearRegex = /^.*(\d\d\d\d).*$/g;
@@ -77,13 +78,13 @@ function getData(dom) {
   // Dates
   const objDate = new Date();
   data.visitDate = objDate.getFullYear();
-  data.yearPublish = '0000';
+  data.yearPublish = '';
 
   return data;
 }
 
 async function scrapingData(links) {
-  dataURLs = []
+  dataList = []
   for (const link of links) {
     data = {}
     try {
@@ -98,12 +99,12 @@ async function scrapingData(links) {
         data = await getData(dom);
       }
       data.URL = link
-      dataURLs.push(data)
+      dataList.push(data)
     } catch (error) {
       console.log(error);
     }
   }
-  return dataURLs
+  return dataList
 }
 
 

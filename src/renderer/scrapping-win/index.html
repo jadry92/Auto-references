@@ -4,21 +4,44 @@
 <head>
   <meta charset="UTF-8">
   <title>Auto References</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
   <link rel="stylesheet" href="../../assets/index.css">
-  <script src="frontend.js" type="text/javascript" charset="utf-8"></script>
 </head>
 
 <body>
-  <h3 class="title">Add the links of the references</h3>
-  <form action="">
-    <label for="url">URLs</label>
-    <textarea rows="10" cols="50" name="url" id="url"></textarea>
-    <button type="submit" id="scrapping">Scrapping</button>
-  </form>
-  <div>
-    <ul class="list-group">
-    </ul>
-  </div>
+  <main>
+    <div class="container">
+      <div class="row">
+        <h1 class="title">Auto References App</h3>
+      </div>
+      <div class="row">
+        <h4 class="show">Add the links:</h3>
+          <form class="form-div__form">
+            <div id="urls-form-input" class="input-field">
+              <textarea name=" url" id="url" class="materialize-textarea validate"></textarea>
+              <span class="helper-text" data-error="Wrong URl or URLs">write a list of the pages which you would like to
+                reference</span>
+            </div>
+            <a class="btn primary-btn" type="submit" id="scrapping">Generate</a>
+          </form>
+      </div>
+    </div>
+    <div class="container">
+      <ul class="list-group">
+      </ul>
+    </div>
+  </main>
+  <footer class="page-footer">
+    <div class="footer-copyright">
+      <a class="grey-text text-lighten-4 left" href="https://github.com/jadry92/Auto-references/blob/master/LICENSE">MIT
+        License</a>
+      <a class="grey-text text-lighten-4 right" href="https://github.com/jadry92/Auto-references">Github
+        Rep</a>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script src="frontend.js" type="text/javascript" charset="utf-8"></script>
 </body>
 
 </html>

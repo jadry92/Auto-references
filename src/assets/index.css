@@ -1,14 +1,42 @@
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  margin: auto;
-  max-width: 38rem;
-  padding: 2rem;
+  background-color: #fff;
+  box-sizing: border-box;
+}
+
+main {
+  min-height: 94vh;
 }
 
 .title {
-  color: #fff;
+  color: #000;
+  font-size: 4rem;
+  text-align: center;
+  margin-top: 0px;
+  padding-top: 2rem;
+}
+
+.form-div__form textarea {
+  width: 100%;
+  height: 50px;
 }
 
 .references {
-  color: #fff;
+  color:#000;
+}
+
+.mb-0{
+  margin-bottom: 0;
+}
+
+.references-form label {
+  color: #000;
+}
+
+.page-footer {
+  padding: 0px;
+  margin: 0px;
+}
+
+.page-footer a {
+  margin: 0 20px;
 }
