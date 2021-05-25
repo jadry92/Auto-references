@@ -1,16 +1,12 @@
 // electron imports
-const { app, BrowserWindow, ipcMain, nativeTheme } = require('electron');
+import { app, BrowserWindow, ipcMain, nativeTheme } from 'electron'
 // node imports
-const path = require('path');
+const path = require('path')
 // local imports
-const { scrapingData } = require('./scraping');
+import References from './References'
 
-
-function setMainIpc(mainWindow) {
-  ipcMain.on('submit-form', async (event, links) => {
-    const dataURLs = await scrapingData(links)
-    await event.sender.send('scraping-data', dataURLs)
-  })
+function setMainIpc(mainWindow: BrowserWindow, references: References) {
+  ipcMain.on('submit-form', references.scrapingData)
 }
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -18,7 +14,7 @@ if (require('electron-squirrel-startup')) { // eslint-disable-line global-requir
   app.quit();
 }
 
-const createWindow = () => {
+const createWindow = (): void => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 800,
@@ -28,13 +24,13 @@ const createWindow = () => {
     }
   });
 
-  if (process.platform === 'darwin') {
-    mainWindow.defaultTheme = 'light'
-  }
+  // Creating the Reference class
+  const references = new References()
+
   // Set communication IPC
-  setMainIpc(mainWindow);
+  setMainIpc(mainWindow, references);
   // and load the index.html of the app.
-  mainWindow.loadFile(path.join(__dirname, 'renderer/scrapping-win/index.html'));
+  mainWindow.loadFile(path.join(__dirname, '../src/renderer/index.html'));
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
