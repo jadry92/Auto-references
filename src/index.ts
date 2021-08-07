@@ -1,9 +1,11 @@
 // electron imports
 import { app, BrowserWindow, ipcMain, nativeTheme } from 'electron'
 // node imports
-const path = require('path')
+import path from 'path'
 // local imports
 import References from './References'
+
+declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 
 function setMainIpc(mainWindow: BrowserWindow, references: References) {
   ipcMain.on('submit-form', references.scrapingData)
@@ -25,12 +27,13 @@ const createWindow = (): void => {
   });
 
   // Creating the Reference class
-  const references = new References()
+  //const references = new References()
 
   // Set communication IPC
-  setMainIpc(mainWindow, references);
+  //setMainIpc(mainWindow, references);
   // and load the index.html of the app.
-  mainWindow.loadFile(path.join(__dirname, '../src/renderer/index.html'));
+  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+  //mainWindow.loadFile(path.join(__dirname, '../src/win/index.html'));
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();

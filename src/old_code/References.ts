@@ -1,6 +1,6 @@
 /*
 This class implement all the logic of the auto reference tool
-By: Johan Suarez
+By: Johan Suarez Largo
 */
 
 // imports
