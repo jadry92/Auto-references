@@ -25,8 +25,11 @@
  *  });
  * ```
  */
-
-import { ipcRenderer } from 'electron';
+declare global {
+  interface Window {
+    electron: any;
+  }
+}
 
 // react
 import React from 'react';
@@ -40,3 +43,4 @@ import App from '../components/App'
 const container = document.getElementById('app');
 
 ReactDOM.render(App(), container)
+window.electron.notificationApi.sendNotification("Finally!");

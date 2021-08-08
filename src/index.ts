@@ -1,11 +1,12 @@
 // electron imports
-import { app, BrowserWindow, ipcMain, nativeTheme } from 'electron'
+import { app, BrowserWindow, ipcMain, nativeTheme, Notification } from 'electron'
 // node imports
 import path from 'path'
 // local imports
 import References from './References'
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
+declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
 function setMainIpc(mainWindow: BrowserWindow, references: References) {
   ipcMain.on('submit-form', references.scrapingData)
@@ -22,15 +23,17 @@ const createWindow = (): void => {
     width: 800,
     height: 800,
     webPreferences: {
-      nodeIntegration: true
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     }
   });
-
-  // Creating the Reference class
-  //const references = new References()
+  ipcMain.on("notify", (_, message) => {
+    new Notification({ title: "Notification", body: message }).show();
+  })
+  // Creating the Reference Obj
+  //const referencesObj = new References()
 
   // Set communication IPC
-  //setMainIpc(mainWindow, references);
+  //setMainIpc(mainWindow, referencesObj);
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
   //mainWindow.loadFile(path.join(__dirname, '../src/win/index.html'));
