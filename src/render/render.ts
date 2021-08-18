@@ -31,16 +31,16 @@ declare global {
   }
 }
 
-// react
-import React from 'react';
-import ReactDOM from 'react-dom';
 // css
 import 'materialize-css/dist/css/materialize.css';
 import '../assets/style.css'
+
 // components
 import App from '../components/App'
+// react
+import React from 'react';
+import ReactDOM from 'react-dom';
 
 const container = document.getElementById('app');
 
 ReactDOM.render(App(), container)
-window.electron.notificationApi.sendNotification("Finally!");

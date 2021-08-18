@@ -3,12 +3,13 @@ This class implement all the logic of the auto reference tool
 By: Johan Suarez Largo
 */
 
-// imports
-import fetch from 'node-fetch'
-import { JSDOM } from 'jsdom'
-import { IpcMainEvent } from 'electron/main';
+import { HTMLElement, parse } from 'node-html-parser';
 
-export interface ReferenceData {
+import { IpcMainEvent } from 'electron/main';
+import crypto from 'crypto'
+import fetch from 'node-fetch'
+
+interface ReferenceData {
   title: string,
   authorName: string,
   authorSurname: string,
@@ -17,7 +18,9 @@ export interface ReferenceData {
   URL: string,
   id: string
 }
-export function emptyReferenceData(): ReferenceData {
+
+
+function emptyReferenceData(): ReferenceData {
   return {
     title: '',
     authorName: '',
@@ -28,7 +31,8 @@ export function emptyReferenceData(): ReferenceData {
     id: ''
   }
 }
-export default class References {
+
+class References {
 
   referenceList: [ReferenceData];
   private titleRegex: RegExp = /^.+\s[\|\-\.]\s([\w\s]{4,30})$/g;
@@ -38,51 +42,58 @@ export default class References {
 
   }
 
-  scrapingData(event: IpcMainEvent, dataList: { id: string, validation: boolean, URL: string }[]) {
-    this.fetchData(event, dataList)
-      .then((dataParsed) => event.sender.send('data-ready', dataParsed))
-      .catch(() => console.log('error in the data parser process or save'))
+  scrapingData = (event: IpcMainEvent, listOfLinks: Set<string>) => {
+
+    this.fetchData(event, listOfLinks).then(
+      (dataRespond) => event.sender.send('data-ready', dataRespond)
+    )
+
+    //  .then((dataParsed) => console.log(dataParsed))//event.sender.send('data-ready', dataParsed))
+    // .catch(() => console.log('error in the data parser process or save'))
   }
 
-  private async fetchData(event: IpcMainEvent, dataList: { id: string, validation: boolean, URL: string }[]): Promise<[ReferenceData]> {
-    let dataRef = emptyReferenceData()
+  private generateID(link: string): string {
+    return crypto.createHash('md5').update(link).digest('hex')
+  }
 
-    for (const data of dataList) {
+
+  private fetchData = async (event: IpcMainEvent, listOfLinks: Set<string>) => {
+    let dataRespond = [] as ReferenceData[]
+    console.log('links' + listOfLinks)
+    const arrayListOfLinks = Array.from(listOfLinks)
+    for (const link of arrayListOfLinks) {
       try {
-        if (data.validation) {
-
-          const response = await fetch(data.URL);
-          const text = await response.text();
-          const dom = new JSDOM(text);
-          if (data.URL.match('^.+wikipedia\.org.+$')) {
-            dataRef = this.getDataWiki(dom)
-          } else if (data.URL.match('^.+youtube\.com.+$')) {
-            dataRef = this.getDataYouTube(dom)
-          } else {
-            dataRef = this.getData(dom);
-          }
+        let referencesData = {} as ReferenceData
+        const response = await fetch(link);
+        const text = await response.text();
+        const dom = parse(text);
+        if (link.match('^.+wikipedia\.org.+$')) {
+          referencesData = this.getDataWiki(dom)
+        } else if (link.match('^.+youtube\.com.+$')) {
+          referencesData = this.getDataYouTube(dom)
+        } else {
+          referencesData = this.getData(dom);
         }
-        dataRef.URL = data.URL
-        dataRef.id = data.id
-        this.referenceList.push(dataRef)
+        referencesData.URL = link
+        referencesData.id = this.generateID(link)
+        dataRespond.push(referencesData)
       } catch (error) {
         console.log(error);
       }
-      dataRef = emptyReferenceData()
     }
     await this.save()
-    return this.referenceList
-  }
+    return dataRespond
+  };
 
   private save() {
     console.log('save data in db' + this.referenceList)
   }
 
-  private getDataWiki(dom: JSDOM): ReferenceData {
+  private getDataWiki(dom: HTMLElement): ReferenceData {
     let data: ReferenceData = emptyReferenceData()
     // title 
-    const h1Text = dom.window.document.querySelector("h1").textContent;
-    const titleText = dom.window.document.querySelector("title").textContent;
+    const h1Text = dom.querySelector("h1").textContent;
+    const titleText = dom.querySelector("title").textContent;
     data.title = (titleText.match(h1Text) ? titleText.match(h1Text)[0] : titleText);
 
 
@@ -93,16 +104,16 @@ export default class References {
     const objDate = new Date();
     data.visitDate = objDate.getFullYear().toString()
 
-    const lastModText = dom.window.document.querySelector("#footer-info-lastmod").textContent;
+    const lastModText = dom.querySelector("#footer-info-lastmod").textContent;
     data.yearPublish = this.yearRegex.exec(lastModText)[1];
 
     return data;
   }
 
 
-  private getDataYouTube(dom: JSDOM): ReferenceData {
+  private getDataYouTube(dom: HTMLElement): ReferenceData {
     let data: ReferenceData = emptyReferenceData()
-    const linkTags: NodeListOf<HTMLElement> = dom.window.document.querySelectorAll("link");
+    const linkTags = dom.querySelectorAll("link");
     linkTags.forEach(tag => {
       if (tag.getAttribute('itemprop') === 'name') {
         data.authorName = tag.getAttribute('content');
@@ -113,7 +124,7 @@ export default class References {
     // Dates
     const objDate = new Date();
     data.visitDate = objDate.getFullYear().toString();
-    const metaTags: NodeListOf<HTMLElement> = dom.window.document.querySelectorAll("meta");
+    const metaTags = dom.querySelectorAll("meta");
     metaTags.forEach(tag => {
       if (tag.getAttribute('itemprop') === 'datePublished') {
         const textDate = this.yearRegex.exec(tag.getAttribute('content'))
@@ -126,11 +137,11 @@ export default class References {
     return data;
   }
 
-  private getData(dom: JSDOM): ReferenceData {
+  private getData(dom: HTMLElement): ReferenceData {
     let data: ReferenceData = emptyReferenceData()
     // title 
-    const h1Text: string = dom.window.document.querySelector("h1").textContent;
-    const titleText: string = dom.window.document.querySelector("title").textContent;
+    const h1Text: string = dom.querySelector("h1").textContent;
+    const titleText: string = dom.querySelector("title").textContent;
     data.title = (titleText.match(h1Text) ? titleText.match(h1Text)[0] : titleText);
     // Author data
     const title = this.titleRegex.exec(titleText)
@@ -143,5 +154,9 @@ export default class References {
 
     return data;
   }
+
 }
+
+export default References;
+
 

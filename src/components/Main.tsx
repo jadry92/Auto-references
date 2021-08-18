@@ -1,22 +1,21 @@
-// electron
-import { } from 'electron';
 // react 
 import React, { ReactElement } from 'react'
-// components 
-import TextBox from './TextBox'
 
+import ListReference from './ListReference'
+import TextBox from './TextBox'
 
 //Interfaces
 type AppStages = "input" | "searching" | "showing"
 
-interface ReferenceData {
+export interface ReferenceData {
   title: string,
   authorName: string,
   authorSurname: string,
   visitDate: string,
   yearPublish: string,
   URL: string,
-  id: string
+  id: string,
+  valid?: boolean,
 }
 
 interface IProps {
@@ -38,22 +37,25 @@ class Main extends React.Component<IProps, IState> {
       wrongLink: false,
       appStage: "input"
     }
-    //this.setIpc()
+    this.setIpc()
   }
 
   setIpc = (): void => {
-    //ipcRenderer.on('data-ready', (event: Event, dataList: [ReferenceData]) => {
-    //this.setState({ listReferences: dataList, appStage: "showing" })
-    //})
+    window.electron.onEventsAPI.onScrapingFinish(this.receiveDataFromScraping)
   }
+
+  receiveDataFromScraping = (event: Event, dataList: [ReferenceData]) => {
+    console.log('received', dataList)
+    this.setState({ listReferences: dataList, appStage: "showing" })
+  }
+
   summitLinks = (event: MouseEvent) => {
     event.preventDefault()
 
     if (this.state.listOfLinks) {
       console.log(this.state.listOfLinks)
       this.setState({ appStage: "searching" })
-      //electron.notificationApi.sendNotification("Finally!");
-      //ipcRenderer.send('submit-form', this.state.listOfLinks)
+      window.electron.dataAPI.postLinks(this.state.listOfLinks);
     } else {
       console.log('error')
     }
@@ -119,7 +121,7 @@ class Main extends React.Component<IProps, IState> {
         break;
       }
       case "showing": {
-        //visualArea = this.state.listReferences
+        visualArea = <ListReference list={this.state.listReferences} />
         break;
       }
       default: {

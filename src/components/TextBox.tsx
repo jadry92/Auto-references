@@ -1,7 +1,7 @@
-// react
-import React from "react";
 // components
 import AutoTextArea from "./AutoTextArea"
+// react
+import React from "react";
 // interfaces
 interface handelEventFunc {
   (event: any): any
