@@ -3,9 +3,11 @@ import React, { ReactElement } from 'react'
 
 import ListReference from './ListReference'
 import TextBox from './TextBox'
+import { useState } from 'react'
 
 //Interfaces
 type AppStages = "input" | "searching" | "showing"
+type KeysData = 'title' | 'authorName' | 'authorSurname' | 'yearPublish'
 
 export interface ReferenceData {
   title: string,
@@ -104,6 +106,15 @@ class Main extends React.Component<IProps, IState> {
     })
   }
 
+  handelChange = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const newValue = event.target.value;
+    const key = event.target.id as KeysData;
+    const newList: [ReferenceData] = this.state.listReferences
+    newList[index][key] = newValue
+    this.setState({
+      listReferences: newList
+    })
+  }
 
   render() {
     let visualArea: string | ReactElement | {}
@@ -121,7 +132,10 @@ class Main extends React.Component<IProps, IState> {
         break;
       }
       case "showing": {
-        visualArea = <ListReference list={this.state.listReferences} />
+        visualArea = <ListReference
+          list={this.state.listReferences}
+          handelChange={this.handelChange}
+        />
         break;
       }
       default: {
@@ -146,5 +160,10 @@ class Main extends React.Component<IProps, IState> {
     )
   }
 }
+interface handelEventFunc {
+  (event: React.ChangeEvent<HTMLInputElement>, index: number): void
+}
+
+
 
 export default Main;

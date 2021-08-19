@@ -4,7 +4,7 @@ import AutoTextArea from "./AutoTextArea"
 import React from "react";
 // interfaces
 interface handelEventFunc {
-  (event: any): any
+  (event: any): void
 }
 
 interface IProps {
