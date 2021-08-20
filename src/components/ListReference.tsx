@@ -9,10 +9,10 @@ interface handelEventFunc {
 }
 
 interface IProps {
-  list?: [ReferenceData],
-  handelChange?: handelEventFunc,
-  handelDelete?: handelEventFunc,
-  handelSave?: handelEventFunc,
+  list?: [ReferenceData] | [],
+  handelChangeForm?: handelEventFunc,
+  handelDeleteForm?: handelEventFunc,
+  handelSaveForm?: handelEventFunc,
 }
 
 interface IState {
@@ -24,28 +24,10 @@ class ListReference extends Component<IProps, IState> {
     super(props);
   }
 
-  private validInformation = () => {
-
-    this.props.list.forEach((ref) => {
-      if (ref.yearPublish === '0000') {
-        ref.valid = false
-      } else if (ref.authorName === '' || ref.authorSurname === '') {
-        ref.valid = false
-      } else if (ref.title === '') {
-        ref.valid = false
-      } else {
-        ref.valid = true
-      }
-    })
-
-  }
-
-  componentWillUnmount = () => {
-    this.validInformation()
-  }
 
   render() {
     const { list } = this.props
+    console.log('render list', list[0].valid)
     return (
       <div>
         <ul>
@@ -53,7 +35,12 @@ class ListReference extends Component<IProps, IState> {
             <li key={index}>
               {ref.valid ?
                 <Reference data={ref} index={index} /> :
-                <ReferenceForm data={ref} handelChange={this.props.handelChange} index={index} />
+                <ReferenceForm 
+                data={ref} 
+                handelChange={this.props.handelChangeForm}
+                handelDelete={this.props.handelDeleteForm}
+                handelSave={this.props.handelSaveForm}
+                index={index} />
               }
             </li>
           ))}

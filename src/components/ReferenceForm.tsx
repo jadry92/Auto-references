@@ -15,7 +15,6 @@ interface IProps {
 
 const ReferenceForm = ({ data, handelChange, handelDelete, handelSave, index }: IProps) => {
 
-
   const dataArray = [
     { value: data.title, name: 'Title', key: 'title' },
     { value: data.authorName, name: 'Author Name', key: 'authorName' },
@@ -25,7 +24,7 @@ const ReferenceForm = ({ data, handelChange, handelDelete, handelSave, index }: 
 
   return (
     <div className="row">
-      <form action="" id="ref_form" className="col s12">
+      <form action="" id="ref_form" className="col s12" onSubmit={(e) => handelSave(e, index)}>
         <div className="row mb-0">
           <div className="input-field col s4">
             {dataArray.map((item, i) => (
@@ -43,11 +42,12 @@ const ReferenceForm = ({ data, handelChange, handelDelete, handelSave, index }: 
           </div>
         </div>
         <button
-          onClick={(e) => handelSave(e, index)}
+          type="submit"
           className="waves-effect waves-light btn">
           Save
         </button>
         <button
+          type="reset"
           onClick={(e) => handelDelete(e, index)}
           className="waves-effect waves-light btn">
           Delete

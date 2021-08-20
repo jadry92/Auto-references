@@ -25,7 +25,7 @@ interface IProps {
 
 interface IState {
   listOfLinks: Set<string>,
-  listReferences: [ReferenceData],
+  listReferences: [ReferenceData] | [],
   wrongLink: boolean,
   appStage: AppStages,
 }
@@ -49,6 +49,7 @@ class Main extends React.Component<IProps, IState> {
   receiveDataFromScraping = (event: Event, dataList: [ReferenceData]) => {
     console.log('received', dataList)
     this.setState({ listReferences: dataList, appStage: "showing" })
+    this.validInformation()
   }
 
   summitLinks = (event: MouseEvent) => {
@@ -77,7 +78,24 @@ class Main extends React.Component<IProps, IState> {
       listOfLinks: undefined
     })
   }
+  
+  private validInformation = () => {
 
+    const newListReferences = this.state.listReferences 
+    newListReferences.forEach((ref) => {
+      if (ref.yearPublish === '') {
+        ref.valid = false
+      } else if (ref.authorName === '' || ref.authorSurname === '') {
+        ref.valid = false
+      } else if (ref.title === '') {
+        ref.valid = false
+      } else {
+        ref.valid = true
+      }
+    })
+    this.setState({ listReferences:newListReferences })
+
+  }
 
   private cleanData(rawData: string[]): string[] {
     // check if the links a correct, use regular expressions predefine
@@ -106,14 +124,32 @@ class Main extends React.Component<IProps, IState> {
     })
   }
 
-  handelChange = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
+  handelChangeForm = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
     const newValue = event.target.value;
     const key = event.target.id as KeysData;
-    const newList: [ReferenceData] = this.state.listReferences
-    newList[index][key] = newValue
+    const newListReferences = this.state.listReferences
+    newListReferences[index][key] = newValue
     this.setState({
-      listReferences: newList
+      listReferences: newListReferences
     })
+  }
+
+  handelDeleteForm = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    event.preventDefault()
+    const newListReferences = this.state.listReferences
+    newListReferences.splice(index,1)
+    this.setState({
+      listReferences: newListReferences
+    })
+    if (newListReferences.length === 0) {
+      this.setState({appStage: "input"})
+    }
+  }
+  
+  handelSaveForm = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    event.preventDefault()
+    console.log(event)
+    this.validInformation()
   }
 
   render() {
@@ -134,7 +170,9 @@ class Main extends React.Component<IProps, IState> {
       case "showing": {
         visualArea = <ListReference
           list={this.state.listReferences}
-          handelChange={this.handelChange}
+          handelChangeForm={this.handelChangeForm}
+          handelDeleteForm={this.handelDeleteForm}
+          handelSaveForm={this.handelSaveForm}
         />
         break;
       }
@@ -160,10 +198,13 @@ class Main extends React.Component<IProps, IState> {
     )
   }
 }
-interface handelEventFunc {
-  (event: React.ChangeEvent<HTMLInputElement>, index: number): void
-}
-
 
 
 export default Main;
+
+
+/*
+https://lucybain.com/blog/2017/react-js-when-to-rerender/
+https://en.wikipedia.org/wiki/Internet
+https://www.youtube.com/watch?v=czfiWiRAG-c
+*/
