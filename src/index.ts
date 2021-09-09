@@ -1,37 +1,32 @@
-// electron imports
-import { BrowserWindow, Notification, app, ipcMain, nativeTheme } from 'electron'
-
-// local imports
-import References from './References'
+import { app, BrowserWindow, ipcMain, Notification } from 'electron';
+import References from './main/References';
+import setMainIpc from './main/ipcMainEvents';
+import dotenv from 'dotenv';
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
-function setMainIpc(mainWindow: BrowserWindow, referencesObj: References) {
-  ipcMain.on('submit-form', referencesObj.scrapingData)
-}
-
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require('electron-squirrel-startup')) { // eslint-disable-line global-require
+if (require('electron-squirrel-startup')) {
+  // eslint-disable-line global-require
   app.quit();
 }
-
+const referencesObj = new References();
 const createWindow = (): void => {
+  // Configuration Environmental Variables
+  dotenv.config();
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 800,
     webPreferences: {
-      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
+      preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY
     }
   });
-  ipcMain.on("notify", (_, message) => {
-    new Notification({ title: "Notification", body: message }).show();
-  })
+  ipcMain.on('notify', (_, message) => {
+    new Notification({ title: 'Notification', body: message }).show();
+  });
   // Creating the Reference Obj
-
-
-  const referencesObj = new References()
 
   // Set communication IPC
   setMainIpc(mainWindow, referencesObj);
@@ -40,7 +35,9 @@ const createWindow = (): void => {
   //mainWindow.loadFile(path.join(__dirname, '../src/win/index.html'));
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  if (process.env.NODE_MODE === 'development') {
+    mainWindow.webContents.openDevTools();
+  }
 };
 
 // This method will be called when Electron has finished
@@ -52,6 +49,7 @@ app.on('ready', createWindow);
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
+  referencesObj.saveReference();
   if (process.platform !== 'darwin') {
     app.quit();
   }
@@ -64,7 +62,3 @@ app.on('activate', () => {
     createWindow();
   }
 });
-
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and import them here.
-

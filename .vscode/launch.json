@@ -9,12 +9,8 @@
       "windows": {
         "runtimeExecutable": "${workspaceFolder}/node_modules/.bin/electron-forge-vscode-win.cmd"
       },
-      "runtimeArgs": [
-        "foo",
-        "bar"
-      ],
       "cwd": "${workspaceFolder}",
       "protocol": "legacy"
     }
-  ]
+  ],
 }

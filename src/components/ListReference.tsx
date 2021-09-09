@@ -1,55 +1,61 @@
-import React, { Component, useLayoutEffect } from 'react';
-
+import React, { Component } from 'react';
+import { ReferenceData } from '../main/DataStorage';
 import Reference from './Reference';
-import { ReferenceData } from './Main';
 import ReferenceForm from './ReferenceForm';
+import UrlForm from './UrlForm';
+
+// interfaces
+
+type refStatus = 'searching' | 'ready' | 'wrong-data' | 'wrong-link';
 
 interface handelEventFunc {
-  (event: any, index: number): void
+  (event: any): void;
 }
 
 interface IProps {
-  list?: [ReferenceData] | [],
-  handelChangeForm?: handelEventFunc,
-  handelDeleteForm?: handelEventFunc,
-  handelSaveForm?: handelEventFunc,
+  links: Set<string>;
+  listReferences?: [ReferenceData];
 }
 
-interface IState {
-}
+interface IState {}// eslint-disable-line
+
+// Component
 
 class ListReference extends Component<IProps, IState> {
-
   constructor(props: IProps) {
     super(props);
   }
 
+  switchStatus = (ref: ReferenceData, index: number): JSX.Element => {
+    switch (ref.status) {
+      case 'ready':
+        return <Reference index={index} data={ref} />;
+      case 'wrong-data':
+        return <ReferenceForm index={index} data={ref} />;
+      case 'wrong-link':
+        return <UrlForm index={index} link={ref.URL} />;
+      case 'searching':
+        return <p>loading</p>;
+      default:
+        return <h2>Error!!</h2>;
+    }
+  };
 
-  render() {
-    const { list } = this.props
-    console.log('render list', list[0].valid)
+  render(): JSX.Element {
+    console.log(this.props.listReferences);
+    const { listReferences } = this.props;
     return (
       <div>
         <ul>
-          {list.map((ref, index) => (
-            <li key={index}>
-              {ref.valid ?
-                <Reference data={ref} index={index} /> :
-                <ReferenceForm 
-                data={ref} 
-                handelChange={this.props.handelChangeForm}
-                handelDelete={this.props.handelDeleteForm}
-                handelSave={this.props.handelSaveForm}
-                index={index} />
-              }
-            </li>
-          ))}
+          {listReferences
+            ? listReferences.map((ref, index) => (
+                <li key={index}>{this.switchStatus(ref, index)}</li>
+              ))
+            : null}
         </ul>
       </div>
-    )
+    );
   }
 }
 
-
-
-export default ListReference
+export default ListReference;

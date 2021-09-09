@@ -2,16 +2,15 @@
 import React from 'react';
 // Css
 // components
-import Layout from './Layout'
-import Main from './Main'
+import Layout from './Layout';
+import Main from './Main';
 
-
-function App() {
+function App(): JSX.Element {
   return (
     <Layout>
       <Main />
     </Layout>
-  )
+  );
 }
 
 export default App;

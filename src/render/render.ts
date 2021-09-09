@@ -14,16 +14,6 @@
  * To enable Node.js integration in this file, open up `main.js` and enable the `nodeIntegration`
  * flag:
  *
- * ```
- *  // Create the browser window.
- *  mainWindow = new BrowserWindow({
- *    width: 800,
- *    height: 600,
- *    webPreferences: {
- *      nodeIntegration: true
- *    }
- *  });
- * ```
  */
 declare global {
   interface Window {
@@ -33,14 +23,13 @@ declare global {
 
 // css
 import 'materialize-css/dist/css/materialize.css';
-import '../assets/style.css'
+import '../assets/style.css';
 
 // components
-import App from '../components/App'
+import App from '../components/App';
 // react
-import React from 'react';
 import ReactDOM from 'react-dom';
 
 const container = document.getElementById('app');
 
-ReactDOM.render(App(), container)
+ReactDOM.render(App(), container);

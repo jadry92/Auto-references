@@ -1,24 +1,26 @@
 import React, {
-  useState,
+  TextareaHTMLAttributes,
   useEffect,
   useRef,
-  TextareaHTMLAttributes,
-} from "react";
+  useState
+} from 'react';
 
-const AutoTextArea = (props: TextareaHTMLAttributes<HTMLTextAreaElement>) => {
+const AutoTextArea = (
+  props: TextareaHTMLAttributes<HTMLTextAreaElement>
+): JSX.Element => {
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
-  const [text, setText] = useState("");
-  const [textAreaHeight, setTextAreaHeight] = useState("auto");
-  const [parentHeight, setParentHeight] = useState("auto");
+  const [text, setText] = useState('');
+  const [textAreaHeight, setTextAreaHeight] = useState('auto');
+  const [parentHeight, setParentHeight] = useState('auto');
 
   useEffect(() => {
-    setParentHeight(`${textAreaRef.current!.scrollHeight}px`);
-    setTextAreaHeight(`${textAreaRef.current!.scrollHeight}px`);
+    setParentHeight(`${textAreaRef.current.scrollHeight}px`);
+    setTextAreaHeight(`${textAreaRef.current.scrollHeight}px`);
   }, [text]);
 
   const onChangeHandler = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setTextAreaHeight("auto");
-    setParentHeight(`${textAreaRef.current!.scrollHeight}px`);
+    setTextAreaHeight('auto');
+    setParentHeight(`${textAreaRef.current.scrollHeight}px`);
     setText(event.target.value);
 
     if (props.onChange) {
@@ -29,7 +31,7 @@ const AutoTextArea = (props: TextareaHTMLAttributes<HTMLTextAreaElement>) => {
   return (
     <div
       style={{
-        minHeight: parentHeight,
+        minHeight: parentHeight
       }}
     >
       <textarea
@@ -37,7 +39,7 @@ const AutoTextArea = (props: TextareaHTMLAttributes<HTMLTextAreaElement>) => {
         ref={textAreaRef}
         rows={1}
         style={{
-          height: textAreaHeight,
+          height: textAreaHeight
         }}
         onChange={onChangeHandler}
       />

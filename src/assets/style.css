@@ -21,10 +21,10 @@ main {
 }
 
 .references {
-  color:#000;
+  color: #000;
 }
 
-.mb-0{
+.mb-0 {
   margin-bottom: 0;
 }
 
@@ -39,4 +39,23 @@ main {
 
 .page-footer a {
   margin: 0 20px;
+}
+
+.img-copy {
+  width: 50px;
+}
+
+.btn-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.image-done {
+  width: 60%;
+}
+
+.image-edit {
+  width: 60%;
 }
