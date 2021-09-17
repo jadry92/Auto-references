@@ -13,29 +13,31 @@ async function scrapingLink(link: string): Promise<ReferenceData> {
   dataStorage.create(link);
   data = dataStorage.getData(link);
 
-  try {
-    const response = await fetch(link);
-    const text = await response.text();
-    const dom = parse(text);
-    if (link.match('^.+wikipedia.org.+$')) {
-      data = getDataWiki(dom, data);
-    } else if (link.match('.*.pdf$')) {
-      data.title = 'Wrong link';
-    } else if (link.match('^.+youtube.com.+$')) {
-      data = getDataYouTube(dom, data);
-    } else {
-      data = getData(dom, data);
-    }
-    data.status = validInformation(data);
-    const wasUpdated = dataStorage.setData(link, data);
-    if (!wasUpdated) throw new Error('Data not updated');
-  } catch (err: any) {
-    if (err.name === 'FetchError') {
-      data.status = 'wrong-link';
+  if (data.status === 'searching') {
+    try {
+      const response = await fetch(link);
+      const text = await response.text();
+      const dom = parse(text);
+      if (link.match('^.+wikipedia.org.+$')) {
+        data = getDataWiki(dom, data);
+      } else if (link.match('.*.pdf$')) {
+        data.title = 'Wrong link';
+      } else if (link.match('^.+youtube.com.+$')) {
+        data = getDataYouTube(dom, data);
+      } else {
+        data = getData(dom, data);
+      }
+      data.status = validInformation(data);
       const wasUpdated = dataStorage.setData(link, data);
       if (!wasUpdated) throw new Error('Data not updated');
-    } else {
-      throw err;
+    } catch (err: any) {
+      if (err.name === 'FetchError') {
+        data.status = 'wrong-link';
+        const wasUpdated = dataStorage.setData(link, data);
+        if (!wasUpdated) throw new Error('Data not updated');
+      } else {
+        throw err;
+      }
     }
   }
 
@@ -45,7 +47,7 @@ async function scrapingLink(link: string): Promise<ReferenceData> {
 function validInformation(data: ReferenceData): refStatus {
   if (data.title === 'Wrong link') {
     return 'wrong-link';
-  } else if (data.yearPublish === '') {
+  } else if (!data.yearPublish.match(yearRegex)) {
     return 'wrong-data';
   } else if (data.authorName === '' || data.authorSurname === '') {
     return 'wrong-data';
@@ -99,6 +101,7 @@ function getDataYouTube(dom: HTMLElement, data: ReferenceData): ReferenceData {
   metaTags.forEach((tag) => {
     if (tag.getAttribute('itemprop') === 'datePublished') {
       const textDate = yearRegex.exec(tag.getAttribute('content'));
+      console.log(textDate);
       data.yearPublish = textDate ? textDate[0] : tag.getAttribute('content');
     } else if (tag.getAttribute('itemprop') === 'name') {
       data.title = tag.getAttribute('content');

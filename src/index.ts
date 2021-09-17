@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, Notification } from 'electron';
+import { app, BrowserWindow } from 'electron';
 import References from './main/References';
 import setMainIpc from './main/ipcMainEvents';
 import dotenv from 'dotenv';
@@ -23,9 +23,7 @@ const createWindow = (): void => {
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY
     }
   });
-  ipcMain.on('notify', (_, message) => {
-    new Notification({ title: 'Notification', body: message }).show();
-  });
+
   // Creating the Reference Obj
 
   // Set communication IPC

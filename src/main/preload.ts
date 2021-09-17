@@ -10,6 +10,15 @@ contextBridge.exposeInMainWorld('electron', {
       ipcRenderer.send('notify', message);
     }
   },
+  dialogAPI: {
+    errorDialog(title: string, message: string) {
+      const errorData = {
+        title: title,
+        message: message
+      };
+      ipcRenderer.send('error-dialog', errorData);
+    }
+  },
   dataAPI: {
     processLink(link: string) {
       ipcRenderer.send('process-link', link);
@@ -17,8 +26,7 @@ contextBridge.exposeInMainWorld('electron', {
     getReference(link: string) {
       ipcRenderer.send('get-reference', link);
     },
-    remove: {},
-    update: {}
+    remove: {}
   },
   onEventsAPI: {
     onProcessLinkReady(callbackFun: callbackOn) {

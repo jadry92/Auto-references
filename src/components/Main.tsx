@@ -33,22 +33,10 @@ class Main extends React.Component<IProps, IState> {
     this.setIpc();
   }
 
+  // ICP communication
   setIpc = (): void => {
     window.electron.onEventsAPI.onProcessLinkReady(this.requestData);
     window.electron.onEventsAPI.onReferenceReady(this.setListReference);
-  };
-
-  summitLinks = (event: MouseEvent): void => {
-    event.preventDefault();
-
-    if (this.state.listOfLinks) {
-      this.state.listOfLinks.forEach((link) => {
-        window.electron.dataAPI.processLink(link);
-      });
-      this.setState({ appStage: 'output' });
-    } else {
-      console.log('error');
-    }
   };
 
   requestData = (event: Event, link: string): void => {
@@ -75,6 +63,8 @@ class Main extends React.Component<IProps, IState> {
     }
   };
 
+  // Text box actions
+
   restSearch = (event: MouseEvent): void => {
     event.preventDefault();
     // This function reset the app to initial stage
@@ -90,32 +80,20 @@ class Main extends React.Component<IProps, IState> {
     });
   };
 
-  private cleanData(rawData: string[]): string[] {
-    // check if the links a correct, use regular expressions predefine
-    const arrayLinks = [];
-    const wellURL = /^https?:\/\/.+$/g;
-    const normalURL = /^w?w?w?\.?.*\.[a-z]{2,5}\/[\w/]{1,}/g;
-    rawData.filter((str) => str != '');
-    for (const row of rawData) {
-      if (wellURL.exec(row)) {
-        arrayLinks.push(row);
-      } else if (normalURL.exec(row)) {
-        arrayLinks.push('http://' + row);
-      } else {
-        // this.setState({ wrongLink: true });
-      }
+  setLinksFromTextBox = (listOfLinks: Set<string>): void => {
+    if (listOfLinks) {
+      listOfLinks.forEach((link) => {
+        window.electron.dataAPI.processLink(link);
+      });
+      this.setState({
+        listOfLinks: listOfLinks
+      });
+    } else {
+      console.log('error no links in listOfLinks');
     }
-    return arrayLinks;
-  }
-
-  handelChangeTextBox = (event: React.ChangeEvent<HTMLInputElement>): void => {
-    const rawData = event.target.value.split('\n');
-    const arrayLinks = this.cleanData(rawData);
-    const listOfLinks = new Set(arrayLinks);
-    this.setState({
-      listOfLinks: listOfLinks
-    });
   };
+
+  // Update form handler
 
   handelChangeForm = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -155,42 +133,27 @@ class Main extends React.Component<IProps, IState> {
     }
   };
 
+  //TODO: Re-request data link
+
+  //TODO: Delete link handler
+
   render(): JSX.Element {
-    let visualArea: ReactElement;
-
-    switch (this.state.appStage) {
-      case 'input': {
-        visualArea = (
-          <TextBox
-            handelClickClear={this.clearBox}
-            handelClickSummit={this.summitLinks}
-            handelOnChange={this.handelChangeTextBox}
-          />
-        );
-        break;
-      }
-      case 'output': {
-        visualArea = (
-          <ListReference
-            links={this.state.listOfLinks}
-            listReferences={this.state.listReferences}
-          />
-        );
-        break;
-      }
-      default: {
-        visualArea = <h1>error</h1>;
-        break;
-      }
-    }
-
+    console.log(this.state.listOfLinks);
     return (
       <main>
         <div className="container">
           <div className="row">
             <h1 className="title">Auto References </h1>
           </div>
-          <div className="row">{visualArea}</div>
+          <div className="row">
+            <TextBox setLinksFromTextBox={this.setLinksFromTextBox} />
+          </div>
+          <div className="row">
+            <ListReference
+              links={this.state.listOfLinks}
+              listReferences={this.state.listReferences}
+            />
+          </div>
           <div className="row">
             <div className="col s1 offset-s9">
               {this.state.appStage === 'output' ? (

@@ -6,7 +6,6 @@ Author: Johan Suarez Largo
 */
 
 import { IpcMainEvent } from 'electron/main';
-import { dialog } from 'electron';
 import DataStorage from './DataStorage';
 import scrapingLink from './Scraping';
 

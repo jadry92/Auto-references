@@ -9,14 +9,18 @@ const AutoTextArea = (
   props: TextareaHTMLAttributes<HTMLTextAreaElement>
 ): JSX.Element => {
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
-  const [text, setText] = useState('');
+  const [text, setText] = useState(props.value);
   const [textAreaHeight, setTextAreaHeight] = useState('auto');
   const [parentHeight, setParentHeight] = useState('auto');
 
   useEffect(() => {
     setParentHeight(`${textAreaRef.current.scrollHeight}px`);
     setTextAreaHeight(`${textAreaRef.current.scrollHeight}px`);
-  }, [text]);
+    if (props.value === '') {
+      setParentHeight('auto');
+      setTextAreaHeight('auto');
+    }
+  }, [text, props.value]);
 
   const onChangeHandler = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setTextAreaHeight('auto');
