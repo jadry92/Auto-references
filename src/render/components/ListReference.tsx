@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
-import { ReferenceData } from '../main/DataStorage';
+import { ReferenceData } from '../../main/DataStorage';
+import Loader from './Loader';
 import Reference from './Reference';
 import ReferenceForm from './ReferenceForm';
 import UrlForm from './UrlForm';
 
 // interfaces
-
-type refStatus = 'searching' | 'ready' | 'wrong-data' | 'wrong-link';
 
 interface handelEventFunc {
   (event: any): void;
@@ -26,30 +25,32 @@ class ListReference extends Component<IProps, IState> {
     super(props);
   }
 
-  switchStatus = (ref: ReferenceData, index: number): JSX.Element => {
-    switch (ref.status) {
+  private switchStatus = (item: ReferenceData, index: number): JSX.Element => {
+    switch (item.status) {
       case 'ready':
-        return <Reference index={index} data={ref} />;
+        return <Reference index={index} data={item} />;
+      case 'editing':
+        return <ReferenceForm index={index} data={item} />;
       case 'wrong-data':
-        return <ReferenceForm index={index} data={ref} />;
+        return <ReferenceForm index={index} data={item} />;
       case 'wrong-link':
-        return <UrlForm index={index} link={ref.URL} />;
+        return <UrlForm index={index} data={item} />;
       case 'searching':
-        return <p>loading</p>;
+        return <Loader />;
       default:
         return <h2>Error!!</h2>;
     }
   };
 
   render(): JSX.Element {
-    console.log(this.props.listReferences);
     const { listReferences } = this.props;
+
     return (
       <div>
         <ul>
           {listReferences
-            ? listReferences.map((ref, index) => (
-                <li key={index}>{this.switchStatus(ref, index)}</li>
+            ? listReferences.map((item, index) => (
+                <li key={item.URL}>{this.switchStatus(item, index)}</li>
               ))
             : null}
         </ul>

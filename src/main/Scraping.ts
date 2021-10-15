@@ -1,6 +1,7 @@
 import { HTMLElement, parse } from 'node-html-parser';
 import DataStorage, { ReferenceData, refStatus } from './DataStorage';
 import fetch from 'node-fetch';
+import dns from 'dns';
 import { dialog } from 'electron';
 
 const titleRegex = /^.+\s[|\-.]\s([\w\s]{4,30})$/g;
@@ -12,8 +13,12 @@ async function scrapingLink(link: string): Promise<ReferenceData> {
 
   dataStorage.create(link);
   data = dataStorage.getData(link);
+  const isThereInternet = await testInternetConnection();
 
-  if (data.status === 'searching') {
+  if (
+    (data.status === 'searching' || data.status === 'wrong-link') &&
+    isThereInternet
+  ) {
     try {
       const response = await fetch(link);
       const text = await response.text();
@@ -39,12 +44,22 @@ async function scrapingLink(link: string): Promise<ReferenceData> {
         throw err;
       }
     }
+  } else if (!isThereInternet && data.status === 'searching') {
+    data.title = 'Non internet connection';
+    data.status = validInformation(data);
   }
 
   return data;
 }
 
-function validInformation(data: ReferenceData): refStatus {
+function testInternetConnection() {
+  return dns.promises
+    .lookup('google.com')
+    .then(() => true)
+    .catch(() => false);
+}
+
+export function validInformation(data: ReferenceData): refStatus {
   if (data.title === 'Wrong link') {
     return 'wrong-link';
   } else if (!data.yearPublish.match(yearRegex)) {

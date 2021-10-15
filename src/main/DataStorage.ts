@@ -12,7 +12,12 @@ type indexRef =
   | 'yearPublish'
   | 'URL'
   | 'status';
-export type refStatus = 'searching' | 'ready' | 'wrong-data' | 'wrong-link';
+export type refStatus =
+  | 'searching'
+  | 'ready'
+  | 'wrong-data'
+  | 'wrong-link'
+  | 'editing';
 
 export interface ReferenceData {
   title: string;
@@ -81,6 +86,16 @@ class DataStorage {
     }
   };
 
+  public enableEditing = (link: string): boolean => {
+    const index = this.generateID(link);
+    if (Object.keys(this.data).includes(index)) {
+      this.data[index].status = 'editing';
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   public create = (link: string): boolean => {
     const index = this.generateID(link);
     if (!Object.keys(this.data).includes(index)) {
@@ -93,6 +108,42 @@ class DataStorage {
         URL: link,
         status: 'searching'
       };
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  public changeUrlAndSearch = (oldLink: string, newLink: string): boolean => {
+    const oldIndex = this.generateID(oldLink);
+    const newIndex = this.generateID(newLink);
+    if (
+      Object.keys(this.data).includes(oldIndex) &&
+      !Object.keys(this.data).includes(newIndex)
+    ) {
+      const refData = this.data[oldIndex];
+      delete this.data[oldIndex];
+      refData.URL = newLink;
+      refData.status = 'searching';
+      this.data[newIndex] = refData;
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  public changeUrlAndEdit = (oldLink: string, newLink: string): boolean => {
+    const oldIndex = this.generateID(oldLink);
+    const newIndex = this.generateID(newLink);
+    if (
+      Object.keys(this.data).includes(oldIndex) &&
+      !Object.keys(this.data).includes(newIndex)
+    ) {
+      const refData = this.data[oldIndex];
+      delete this.data[oldIndex];
+      refData.URL = newLink;
+      refData.status = 'editing';
+      this.data[newIndex] = refData;
       return true;
     } else {
       return false;

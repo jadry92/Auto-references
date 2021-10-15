@@ -1,7 +1,13 @@
 import React from 'react';
 
-class Layout extends React.Component {
-  render() {
+interface IProps {
+  children: any;
+}
+
+interface IState {}// eslint-disable-line
+
+class Layout extends React.Component<IProps, IState> {
+  render(): JSX.Element {
     return (
       <React.Fragment>
         {this.props.children}

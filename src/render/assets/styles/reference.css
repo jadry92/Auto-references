@@ -1,0 +1,14 @@
+.btn-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+.image-done {
+  width: 60%;
+}
+
+.image-edit {
+  width: 60%;
+}

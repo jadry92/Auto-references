@@ -30,7 +30,6 @@ const createWindow = (): void => {
   setMainIpc(mainWindow, referencesObj);
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
-  //mainWindow.loadFile(path.join(__dirname, '../src/win/index.html'));
 
   // Open the DevTools.
   if (process.env.NODE_MODE === 'development') {

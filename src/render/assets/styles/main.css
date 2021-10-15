@@ -11,25 +11,12 @@ main {
   color: #000;
   font-size: 4rem;
   text-align: center;
-  margin-top: 0px;
+  margin: 0px;
   padding-top: 2rem;
 }
 
-.form-div__form textarea {
-  width: 100%;
-  height: 50px;
-}
-
-.references {
-  color: #000;
-}
-
-.mb-0 {
-  margin-bottom: 0;
-}
-
-.references-form label {
-  color: #000;
+.form-title {
+  margin: 0rem;
 }
 
 .page-footer {
@@ -41,21 +28,13 @@ main {
   margin: 0 20px;
 }
 
-.img-copy {
-  width: 50px;
-}
-
-.btn-container {
+.btn-copy {
+  width: 70px;
+  height: 70px;
   display: flex;
   justify-content: center;
-  margin-bottom: 10px;
   align-items: center;
 }
-
-.image-done {
-  width: 60%;
-}
-
-.image-edit {
-  width: 60%;
+.img-copy {
+  width: 50px;
 }

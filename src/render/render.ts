@@ -23,10 +23,10 @@ declare global {
 
 // css
 import 'materialize-css/dist/css/materialize.css';
-import '../assets/style.css';
+import './assets/styles/main.css';
 
 // components
-import App from '../components/App';
+import App from './components/App';
 // react
 import ReactDOM from 'react-dom';
 

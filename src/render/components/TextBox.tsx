@@ -1,8 +1,9 @@
 // components
-// react
 import { valid } from 'node-html-parser';
 import React, { ReactEventHandler } from 'react';
 import AutoTextArea from './AutoTextArea';
+import imgDrop from '../assets/img/expand_more_black_24dp.svg';
+import '../assets/styles/textbox.css';
 // interfaces
 interface handelEventFunc {
   (event: any): void;
@@ -18,12 +19,14 @@ interface IState {
   errorMsm: string;
   numberOfLinks: number;
   numberOfLinksValidated: number;
+  isTextBoxHidden: boolean;
 }
 
 class TextBox extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this.state = {
+      isTextBoxHidden: false,
       textBoxValue: '',
       wasSendIt: false,
       errorMsm: '',
@@ -50,7 +53,8 @@ class TextBox extends React.Component<IProps, IState> {
         wasSendIt: true,
         numberOfLinksValidated: listOfLinks.size,
         numberOfLinks: arrayLinks.length,
-        errorMsm: ''
+        errorMsm: '',
+        isTextBoxHidden: true
       });
     } else {
       const message =
@@ -90,67 +94,85 @@ class TextBox extends React.Component<IProps, IState> {
     return arrayLinks;
   }
 
+  toggleHidden = (): void => {
+    this.setState({ isTextBoxHidden: !this.state.isTextBoxHidden });
+  };
+
   render(): JSX.Element {
     const {
       textBoxValue,
       wasSendIt,
       errorMsm,
       numberOfLinks,
-      numberOfLinksValidated
+      numberOfLinksValidated,
+      isTextBoxHidden
     } = this.state;
 
     return (
-      <div className="row">
-        <h4 id="form-title" className="show">
-          Links:
-        </h4>
-        <form
-          className="form-div__form"
-          onSubmit={this.summitLinks}
-          onReset={this.handelBoxClear}
-        >
-          <div id="urls-form-input" className="input-field">
-            <AutoTextArea
-              onChange={this.handelChangeTextBox}
-              value={textBoxValue}
-              name="url"
-              id="url"
-              className={`materialize-textarea validate ${
-                errorMsm === '' ? 'valid' : 'invalid'
-              }`}
-            ></AutoTextArea>
-            <span className={`helper-text ${wasSendIt && 'green-text'}`}>
-              {!wasSendIt
-                ? 'write a list of the web pages which you would like to reference'
-                : `${numberOfLinksValidated}/${numberOfLinks} Links was sent to create reference`}
-            </span>
-            <span className="red-text">
-              {errorMsm !== '' && 'There are one or more links wrong typed'}
-            </span>
+      <React.Fragment>
+        <div className="row">
+          <div className="col s3 ">
+            <h4 className="form-title">Links</h4>
           </div>
-          <div className="col">
-            <button
-              className={`btn ${wasSendIt && 'disabled'}`}
-              type="submit"
-              id="scrapping"
-            >
-              Generate
-            </button>
+          <div className="col s1 arrow-container valign-wrapper">
+            <img
+              src={imgDrop}
+              alt=""
+              className={isTextBoxHidden ? 'img-arrow-up' : 'img-arrow-down'}
+              onClick={this.toggleHidden}
+            />
           </div>
-          <div className="col">
-            <button
-              //onClick={this.handelBoxClear}
-              className={`btn red accent-3 ${
-                textBoxValue === '' ? 'disabled' : ''
-              }`}
-              type="reset"
-              id="reset"
-            >
-              Clear
-            </button>
-          </div>
-        </form>
-      </div>
+        </div>
+        <div className="row">
+          <form
+            hidden={isTextBoxHidden}
+            className="form-div__form"
+            onSubmit={this.summitLinks}
+            onReset={this.handelBoxClear}
+          >
+            <div id="urls-form-input" className="input-field">
+              <AutoTextArea
+                onChange={this.handelChangeTextBox}
+                value={textBoxValue}
+                name="url"
+                id="url"
+                className={`materialize-textarea validate ${
+                  errorMsm === '' ? 'valid' : 'invalid'
+                }`}
+              ></AutoTextArea>
+              <span className={`helper-text ${wasSendIt && 'green-text'}`}>
+                {!wasSendIt
+                  ? 'write a list of the web pages which you would like to reference'
+                  : `${numberOfLinksValidated}/${numberOfLinks} Links was sent to create reference`}
+              </span>
+              <span className="red-text">
+                {errorMsm !== '' && 'There are one or more links wrong typed'}
+              </span>
+            </div>
+            <div className="col">
+              <button
+                className={`btn ${wasSendIt && 'disabled'}`}
+                type="submit"
+                id="scrapping"
+              >
+                Generate
+              </button>
+            </div>
+            <div className="col">
+              <button
+                //onClick={this.handelBoxClear}
+                className={`btn red accent-3 ${
+                  textBoxValue === '' ? 'disabled' : ''
+                }`}
+                type="reset"
+                id="reset"
+              >
+                Clear
+              </button>
+            </div>
+          </form>
+        </div>
+      </React.Fragment>
     );
   }
 }
