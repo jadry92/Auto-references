@@ -2,7 +2,7 @@
  Author: Johan Suarez
  */
 // react
-import React, { ReactElement } from 'react';
+import React from 'react';
 import { IpcRendererEvent } from 'electron/main';
 import ListReference from './ListReference';
 import TextBox from './TextBox';
@@ -51,12 +51,10 @@ class Main extends React.Component<IProps, IState> {
         this.dropReference(oldLink);
         this.addLink(newLink);
         window.electron.dataAPI.processLink(newLink);
-        console.log('i search again');
       } else if (action === 'change-url-edit') {
         this.dropReference(oldLink);
         this.addLink(newLink);
         window.electron.dataAPI.getReference(newLink);
-        console.log('i will do manually');
       }
     }
   };
@@ -160,52 +158,6 @@ class Main extends React.Component<IProps, IState> {
 
   // Update form handler
 
-  updateReferenceData = (link: string, data: ReferenceData): void => {
-    window.electron.dataAPI.updateReference(link, data);
-  };
-
-  handelChangeForm = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    index: number
-  ): void => {
-    const value = event.target.value;
-    const key = event.target.id;
-    //this.updateReferenceData(value, index, key);
-  };
-
-  deleteReference = (index: number): void => {
-    const newListReferences = this.state.listReferences;
-    newListReferences.splice(index, 1);
-    this.setState({
-      listReferences: newListReferences
-    });
-  };
-
-  handelSaveForm = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    index: number
-  ): void => {
-    event.preventDefault();
-  };
-
-  handelDeleteForm = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    index: number
-  ): void => {
-    event.preventDefault();
-    const newListReferences = this.state.listReferences;
-    newListReferences.splice(index, 1);
-    this.setState({
-      listReferences: newListReferences
-    });
-    if (!newListReferences.length) {
-      this.setState({
-        listReferences: undefined,
-        listOfLinks: undefined
-      });
-    }
-  };
-
   private getRefText = (refData: ReferenceData): string => {
     if (refData.authorName === refData.authorSurname) {
       return `${refData.authorSurname}. (${refData.yearPublish}). ${refData.title} Retrieved from <${refData.URL}>`;
@@ -227,26 +179,15 @@ class Main extends React.Component<IProps, IState> {
     window.electron.dataAPI.copyClipBoard(text);
   };
 
-  componentDidMount = () => {
-    // mock data
-
-    setTimeout(() => {
-      const links = createMockData();
-      this.setLinksFromTextBox(links);
-    }, 1000);
-    //
-  };
-
   render(): JSX.Element {
     const { listReferences, listOfLinks } = this.state;
-    console.log('RENDER');
-    //console.log(listOfLinks);
-    //console.log(listReferences);
+
     return (
       <main>
         <div className="container">
-          <div className="row">
+          <div className="row mg-top-0">
             <img
+              className="img-internet"
               src={navigator.onLine ? onLineImg : offLineImg}
               alt="internet-status"
             />
@@ -269,7 +210,7 @@ class Main extends React.Component<IProps, IState> {
             <div className="col s1 offset-s9">
               {listReferences ? (
                 <button
-                  className="btn-copy btn-floating green accent-3"
+                  className="btn-copy btn-floating  green accent-3"
                   onClick={this.copyClipBoard}
                 >
                   <img src={copyImg} className="img-copy" alt="copy" />
@@ -284,17 +225,6 @@ class Main extends React.Component<IProps, IState> {
 }
 
 export default Main;
-
-function createMockData() {
-  const links = [
-    'https://www.flase-domaion.com',
-    'https://lucybain.com/blog/2017/react-js-when-to-rerender/',
-    'https://www.youtube.com/watch?v=2tUu_zRhPMg',
-    'https://en.wikipedia.org/wiki/Internet',
-    'https://www.accc.gov.au/system/files/20-47RPT_Communications_Market_Report_FA.pdf'
-  ];
-  return new Set(links);
-}
 
 /*
 https://www.flase-domaion.com
