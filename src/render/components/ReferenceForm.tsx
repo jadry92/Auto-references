@@ -41,6 +41,9 @@ const ReferenceForm = ({ data }: IProps): JSX.Element => {
 
   return (
     <div className="row">
+      <div className="col s12">
+        <p className="grey-text">{data.URL}</p>
+      </div>
       <form
         action=""
         id="ref_form"
