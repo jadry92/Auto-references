@@ -4,7 +4,6 @@ import { ReferenceData } from '../../main/DataStorage';
 interface handelEventFunc {
   (event: any, index: number): void;
 }
-type KeysData = 'title' | 'authorName' | 'authorSurname' | 'yearPublish';
 
 interface IProps {
   data?: ReferenceData;
