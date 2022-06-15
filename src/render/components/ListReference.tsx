@@ -12,8 +12,7 @@ interface handelEventFunc {
 }
 
 interface IProps {
-  links: Set<string>;
-  listReferences?: [ReferenceData];
+  listReferences?: ReferenceData[];
 }
 
 interface IState {}// eslint-disable-line

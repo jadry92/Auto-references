@@ -1,180 +1,142 @@
 // components
-import { valid } from 'node-html-parser';
-import React, { ReactEventHandler } from 'react';
+import React, { useState } from 'react';
 import AutoTextArea from './AutoTextArea';
 import imgDrop from '../assets/img/expand_more_black_24dp.svg';
 import '../assets/styles/textbox.css';
+
 // interfaces
 interface handelEventFunc {
   (event: any): void;
 }
 
-interface IProps {
-  setLinksFromTextBox?: handelEventFunc;
-}
+const cleanData = (rawURLs: string[]): string[] => {
+  // check if the links a correct, use regular expressions predefine
 
-interface IState {
-  textBoxValue: string;
-  wasSendIt: boolean;
-  errorMsm: string;
-  numberOfLinks: number;
-  numberOfLinksValidated: number;
-  isTextBoxHidden: boolean;
-}
+  const wellURL = /^https?:\/\/.+$/g;
+  const normalURL = /^w?w?w?\.?.*\.[a-z]{2,5}\/[\w/]{1,}/g;
+  rawURLs.filter((str) => str != '');
 
-class TextBox extends React.Component<IProps, IState> {
-  constructor(props: IProps) {
-    super(props);
-    this.state = {
-      isTextBoxHidden: false,
-      textBoxValue: '',
-      wasSendIt: false,
-      errorMsm: '',
-      numberOfLinks: 0,
-      numberOfLinksValidated: 0
-    };
-  }
+  return rawURLs.map((URL) => {
+    if (URL.match(wellURL)) {
+      return URL;
+    } else if (URL.match(normalURL)) {
+      return 'http://' + URL;
+    } else {
+      console.log('invalid link ' + URL);
+    }
+  });
+};
 
-  private handelChangeTextBox = (
+function TextBox(): JSX.Element {
+  const [itWasSent, setItWasSent] = useState(false);
+  const [isTextBoxHidden, setIsTextBoxHidden] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string>();
+  const [textBoxValue, setTextBoxValue] = useState<string>();
+  const [numberOfURLs, setNumberOfURLs] = useState<number>();
+  const [numberOfURLsValidated, setNumberOfURLsValidated] = useState<number>();
+
+  const handelChangeTextBox = (
     event: React.ChangeEvent<HTMLTextAreaElement>
   ): void => {
-    const rawData = event.target.value;
-    this.setState({ textBoxValue: rawData });
+    const rawText = event.target.value;
+    setTextBoxValue(rawText);
   };
 
-  private summitLinks = (event: React.FormEvent): void => {
+  const handelBoxClear = (event: React.FormEvent) => {
+    console.log('cleare');
+  };
+
+  const toggleHidden = (): void => {
+    setIsTextBoxHidden(!isTextBoxHidden);
+  };
+
+  const summitURLs = (event: React.FormEvent): void => {
     event.preventDefault();
-    const linksRaw = this.state.textBoxValue.split('\n');
-    const arrayLinks = this.cleanData(linksRaw);
-    const listOfLinks = new Set(arrayLinks);
-    if (listOfLinks.size !== 0) {
-      this.props.setLinksFromTextBox(listOfLinks);
-      this.setState({
-        wasSendIt: true,
-        numberOfLinksValidated: listOfLinks.size,
-        numberOfLinks: arrayLinks.length,
-        errorMsm: '',
-        isTextBoxHidden: true
+    const URLsRaw = textBoxValue.split('\n');
+    const setURLs = new Set(cleanData(URLsRaw));
+    const listOfURLs = Array.from(setURLs);
+
+    if (listOfURLs.length !== 0) {
+      listOfURLs.forEach((URL) => {
+        window.electron.dialogAPI.processURL(URL);
       });
+      setNumberOfURLs(URLsRaw.length);
+      setNumberOfURLsValidated(listOfURLs.length);
+      setItWasSent(true);
+      setIsTextBoxHidden(true);
     } else {
-      const message =
-        'The links are in invalid, Please check and send it again';
-      this.setState({
-        errorMsm: message
-      });
+      const message = 'The URLs are in invalid, Please check and send it again';
+      setErrorMsg(message);
       window.electron.dialogAPI.errorDialog('Wrong Link/s', message);
     }
   };
 
-  private handelBoxClear = (event: React.FormEvent) => {
-    this.setState({
-      textBoxValue: '',
-      wasSendIt: false,
-      errorMsm: '',
-      numberOfLinks: 0,
-      numberOfLinksValidated: 0
-    });
-  };
-
-  private cleanData(rawData: string[]): string[] {
-    // check if the links a correct, use regular expressions predefine
-    const arrayLinks = [];
-    const wellURL = /^https?:\/\/.+$/g;
-    const normalURL = /^w?w?w?\.?.*\.[a-z]{2,5}\/[\w/]{1,}/g;
-    rawData.filter((str) => str != '');
-    for (const row of rawData) {
-      if (row.match(wellURL)) {
-        arrayLinks.push(row);
-      } else if (row.match(normalURL)) {
-        arrayLinks.push('http://' + row);
-      } else {
-        console.log('invalid link ' + row);
-      }
-    }
-    return arrayLinks;
-  }
-
-  toggleHidden = (): void => {
-    this.setState({ isTextBoxHidden: !this.state.isTextBoxHidden });
-  };
-
-  render(): JSX.Element {
-    const {
-      textBoxValue,
-      wasSendIt,
-      errorMsm,
-      numberOfLinks,
-      numberOfLinksValidated,
-      isTextBoxHidden
-    } = this.state;
-
-    return (
-      <React.Fragment>
-        <div className="row">
-          <div className="col s3 ">
-            <h4 className="form-title">Links</h4>
-          </div>
-          <div className="col s1 arrow-container valign-wrapper">
-            <img
-              src={imgDrop}
-              alt=""
-              className={isTextBoxHidden ? 'img-arrow-up' : 'img-arrow-down'}
-              onClick={this.toggleHidden}
-            />
-          </div>
+  return (
+    <React.Fragment>
+      <div className="row">
+        <div className="col s3 ">
+          <h4 className="form-title">Links</h4>
         </div>
-        <div className="row">
-          <form
-            hidden={isTextBoxHidden}
-            className="form-div__form"
-            onSubmit={this.summitLinks}
-            onReset={this.handelBoxClear}
-          >
-            <div id="urls-form-input" className="input-field">
-              <AutoTextArea
-                onChange={this.handelChangeTextBox}
-                value={textBoxValue}
-                name="url"
-                id="url"
-                className={`materialize-textarea validate ${
-                  errorMsm === '' ? 'valid' : 'invalid'
-                }`}
-              ></AutoTextArea>
-              <span className={`helper-text ${wasSendIt && 'green-text'}`}>
-                {!wasSendIt
-                  ? 'write a list of the web pages which you would like to reference'
-                  : `${numberOfLinksValidated}/${numberOfLinks} Links was sent to create reference`}
-              </span>
-              <span className="red-text">
-                {errorMsm !== '' && 'There are one or more links wrong typed'}
-              </span>
-            </div>
-            <div className="col">
-              <button
-                className={`btn ${wasSendIt && 'disabled'}`}
-                type="submit"
-                id="scrapping"
-              >
-                Generate
-              </button>
-            </div>
-            <div className="col">
-              <button
-                //onClick={this.handelBoxClear}
-                className={`btn red accent-3 ${
-                  textBoxValue === '' ? 'disabled' : ''
-                }`}
-                type="reset"
-                id="reset"
-              >
-                Clear
-              </button>
-            </div>
-          </form>
+        <div className="col s1 arrow-container valign-wrapper">
+          <img
+            src={imgDrop}
+            alt=""
+            className={isTextBoxHidden ? 'img-arrow-up' : 'img-arrow-down'}
+            onClick={toggleHidden}
+          />
         </div>
-      </React.Fragment>
-    );
-  }
+      </div>
+      <div className="row">
+        <form
+          hidden={isTextBoxHidden}
+          className="form-div__form"
+          onSubmit={summitURLs}
+          onReset={handelBoxClear}
+        >
+          <div id="urls-form-input" className="input-field">
+            <AutoTextArea
+              onChange={handelChangeTextBox}
+              value={textBoxValue}
+              name="url"
+              id="url"
+              className={`materialize-textarea validate ${
+                errorMsg === '' ? 'valid' : 'invalid'
+              }`}
+            ></AutoTextArea>
+            <span className={`helper-text ${itWasSent && 'green-text'}`}>
+              {!itWasSent
+                ? 'write a list of the web pages which you would like to reference'
+                : `${numberOfURLsValidated}/${numberOfURLs} Links was sent to create reference`}
+            </span>
+            <span className="red-text">
+              {errorMsg !== '' && 'There are one or more links wrong typed'}
+            </span>
+          </div>
+          <div className="col">
+            <button
+              className={`btn ${itWasSent && 'disabled'}`}
+              type="submit"
+              id="scrapping"
+            >
+              Generate
+            </button>
+          </div>
+          <div className="col">
+            <button
+              //onClick={handelBoxClear}
+              className={`btn red accent-3 ${
+                textBoxValue === '' ? 'disabled' : ''
+              }`}
+              type="reset"
+              id="reset"
+            >
+              Clear
+            </button>
+          </div>
+        </form>
+      </div>
+    </React.Fragment>
+  );
 }
 
 export default TextBox;

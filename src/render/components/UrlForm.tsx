@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ReferenceData } from '../../main/DataStorage';
 
 interface IProps {
@@ -37,11 +37,6 @@ const UrlForm = ({ index, data }: IProps): JSX.Element => {
       window.electron.dataAPI.requestEditReference(urlText);
     }
   };
-
-  // useEffect(() => {
-  //   setUrlText(data.URL);
-  // }, [data.URL]);
-  // console.log('render url from - ', index, '- ', link === urlText);
 
   return (
     <div className="row">
