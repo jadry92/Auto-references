@@ -10,20 +10,31 @@ import DataStorage, { ReferenceData } from './DataStorage';
 import ScrapingData from './ScrapingData';
 
 class ReferenceAPI {
+  private static API: ReferenceAPI;
   private dataStorage: DataStorage;
 
-  constructor() {
+  private constructor() {
     this.dataStorage = DataStorage.getInstance();
   }
 
-  public processURL = async (
-    event: IpcMainInvokeEvent,
-    URL: string
-  ): Promise<string> => {
+  public static getInstance(): ReferenceAPI {
+    if (!ReferenceAPI.API) {
+      ReferenceAPI.API = new ReferenceAPI();
+    }
+    return ReferenceAPI.API;
+  }
+
+  public processURL = (event: IpcMainEvent, URL: string): void => {
     const scrapingData = new ScrapingData(URL);
-    const dataReference = await scrapingData.parsingReference();
-    this.dataStorage.setData(dataReference);
-    return dataReference.id;
+    scrapingData
+      .parsingReference()
+      .then((dataReference) => {
+        this.dataStorage.setData(dataReference);
+        event.sender.send('process-URL-ready');
+      })
+      .catch((error) => {
+        event.sender.send('on-error', error);
+      });
   };
 
   public getReference = (event: IpcMainEvent, id: string): void => {
@@ -48,6 +59,10 @@ class ReferenceAPI {
   ): void => {
     const result = this.dataStorage.patchDataID(id, data);
     event.sender.send('on-change-reference', 'partialUpdate', result);
+  };
+
+  public saveReference = (): void => {
+    this.dataStorage.save();
   };
 }
 

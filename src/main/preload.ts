@@ -41,8 +41,8 @@ contextBridge.exposeInMainWorld('electron', {
     }
   },
   dataAPI: {
-    processLink(link: string) {
-      ipcRenderer.send('process-link', link);
+    processURL(URL: string) {
+      ipcRenderer.send('process-URL', URL);
     },
     getReference(link: string) {
       ipcRenderer.send('get-reference', link);
@@ -67,8 +67,8 @@ contextBridge.exposeInMainWorld('electron', {
     }
   },
   onEventsAPI: {
-    onProcessLinkReady(callbackFun: callbackOn) {
-      ipcRenderer.on('process-link-ready', callbackFun);
+    onProcessURLReady(callbackFun: callbackOn) {
+      ipcRenderer.on('process-URL-ready', callbackFun);
     },
     onReferenceReady(callbackFun: callbackOn) {
       ipcRenderer.on('get-reference-ready', callbackFun);

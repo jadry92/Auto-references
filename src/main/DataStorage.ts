@@ -4,14 +4,7 @@ import fs from 'fs';
 interface SchemaDataStorage {
   [index: string]: ReferenceData;
 }
-type indexRef =
-  | 'title'
-  | 'authorName'
-  | 'authorSurname'
-  | 'visitDate'
-  | 'yearPublish'
-  | 'URL'
-  | 'status';
+
 export type refStatus =
   | 'searching'
   | 'ready'
@@ -20,6 +13,7 @@ export type refStatus =
   | 'editing';
 
 export interface ReferenceData {
+  id: string;
   title: string;
   authorName: string;
   authorSurname: string;
@@ -30,7 +24,7 @@ export interface ReferenceData {
 }
 
 class DataStorage {
-  private static instance: DataStorage;
+  private static db: DataStorage;
   private path: string;
   private data: SchemaDataStorage;
 
@@ -44,15 +38,19 @@ class DataStorage {
     }
   }
 
-  private generateID = (link: string): string => {
-    return crypto.createHash('md5').update(link).digest('hex');
+  private generateID = (): string => {
+    let uuid = crypto.randomUUID();
+    while (!Object.keys(this.data).includes(uuid)) {
+      uuid = crypto.randomUUID();
+    }
+    return uuid;
   };
 
   public static getInstance(): DataStorage {
-    if (!DataStorage.instance) {
-      DataStorage.instance = new DataStorage();
+    if (!DataStorage.db) {
+      DataStorage.db = new DataStorage();
     }
-    return DataStorage.instance;
+    return DataStorage.db;
   }
 
   public save = (): string => {
@@ -63,97 +61,50 @@ class DataStorage {
     return 'Save';
   };
 
-  public getData = (link: string): ReferenceData => {
-    const index = this.generateID(link);
-    if (Object.keys(this.data).includes(index)) {
-      return this.data[index];
+  public getData = (id: string): ReferenceData => {
+    if (Object.keys(this.data).includes(id)) {
+      return this.data[id];
     } else {
       return null;
     }
   };
 
-  public setData = (link: string, refData: ReferenceData): boolean => {
-    const index = this.generateID(link);
-    if (Object.keys(this.data).includes(index)) {
-      Object.keys(this.data[index]).map(
-        (key) =>
-          this.data[index][<indexRef>key] != refData[<indexRef>key] &&
-          (this.data[index][<indexRef>key] = <refStatus>refData[<indexRef>key])
-      );
-      return true;
-    } else {
-      return false;
+  public putDataID = (reference: ReferenceData): ReferenceData => {
+    if (Object.keys(this.data).includes(reference.id)) {
+      this.data[reference.id] = reference;
+      return this.data[reference.id];
     }
+    return null;
   };
 
-  public enableEditing = (link: string): boolean => {
-    const index = this.generateID(link);
-    if (Object.keys(this.data).includes(index)) {
-      this.data[index].status = 'editing';
-      return true;
-    } else {
-      return false;
+  public patchDataID = (
+    id: string,
+    data: Partial<ReferenceData>
+  ): ReferenceData => {
+    if (Object.keys(this.data).includes(id)) {
+      Object.keys(data).forEach((key) => {
+        this.data[id][<keyof ReferenceData>key] = <refStatus>(
+          data[<keyof ReferenceData>key]
+        );
+      });
+      return this.data[id];
     }
+    return null;
   };
 
-  public create = (link: string): boolean => {
-    const index = this.generateID(link);
-    if (!Object.keys(this.data).includes(index)) {
-      this.data[index] = {
-        title: '',
-        authorName: '',
-        authorSurname: '',
-        visitDate: new Date().getFullYear().toString(),
-        yearPublish: '',
-        URL: link,
-        status: 'searching'
-      };
-      return true;
-    } else {
-      return false;
+  public setData = (reference: ReferenceData): ReferenceData => {
+    if (reference.id === '') {
+      const id = this.generateID();
+      reference.id = id;
+      this.data[id] = reference;
+      return this.data[id];
     }
+    return null;
   };
 
-  public changeUrlAndSearch = (oldLink: string, newLink: string): boolean => {
-    const oldIndex = this.generateID(oldLink);
-    const newIndex = this.generateID(newLink);
-    if (
-      Object.keys(this.data).includes(oldIndex) &&
-      !Object.keys(this.data).includes(newIndex)
-    ) {
-      const refData = this.data[oldIndex];
-      delete this.data[oldIndex];
-      refData.URL = newLink;
-      refData.status = 'searching';
-      this.data[newIndex] = refData;
-      return true;
-    } else {
-      return false;
-    }
-  };
-
-  public changeUrlAndEdit = (oldLink: string, newLink: string): boolean => {
-    const oldIndex = this.generateID(oldLink);
-    const newIndex = this.generateID(newLink);
-    if (
-      Object.keys(this.data).includes(oldIndex) &&
-      !Object.keys(this.data).includes(newIndex)
-    ) {
-      const refData = this.data[oldIndex];
-      delete this.data[oldIndex];
-      refData.URL = newLink;
-      refData.status = 'editing';
-      this.data[newIndex] = refData;
-      return true;
-    } else {
-      return false;
-    }
-  };
-
-  public remove = (link: string): boolean => {
-    const index = this.generateID(link);
-    if (Object.keys(this.data).includes(index)) {
-      delete this.data[index];
+  public deleteData = (id: string): boolean => {
+    if (Object.keys(this.data).includes(id)) {
+      delete this.data[id];
       return true;
     } else {
       return false;

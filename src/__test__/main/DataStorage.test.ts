@@ -4,7 +4,7 @@ This suit test the data storage functionality of the application.
 */
 import DataStorage, { ReferenceData } from '../../main/DataStorage';
 
-describe('This suit test the data storage functionality of the application.', () => {
+describe.skip('This suit test the data storage functionality of the application.', () => {
   const dataStorage = DataStorage.getInstance();
   const link = `https://www.youtube.com/TRUE`;
   const linkWrong = `https://www.youtube.com/FALSE`;

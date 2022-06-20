@@ -1,5 +1,5 @@
 import { HTMLElement, parse } from 'node-html-parser';
-import DataStorage, { ReferenceData, refStatus } from './DataStorage';
+import { ReferenceData, refStatus } from './DataStorage';
 import fetch from 'node-fetch';
 import { testInternetConnection } from './utils';
 import { dialog } from 'electron';

@@ -14,7 +14,7 @@ function isInternetConnection() {
     .catch(() => false);
 }
 
-describe('This suit test the Scraping Functions', () => {
+describe.skip('This suit test the Scraping Functions', () => {
   let dataNoConnection: ReferenceData;
   let isThereInternet: boolean;
   beforeAll(async () => {

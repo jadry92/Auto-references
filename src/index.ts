@@ -1,5 +1,5 @@
 import { app, BrowserWindow } from 'electron';
-import References from './main/References';
+import ReferenceAPI from './main/ReferenceAPI';
 import setMainIpc from './main/ipcMainEvents';
 import dotenv from 'dotenv';
 
@@ -11,7 +11,7 @@ if (require('electron-squirrel-startup')) {
   // eslint-disable-line global-require
   app.quit();
 }
-const referencesObj = new References();
+
 const createWindow = (): void => {
   // Configuration Environmental Variables
   dotenv.config();
@@ -27,7 +27,7 @@ const createWindow = (): void => {
   // Creating the Reference Obj
 
   // Set communication IPC
-  setMainIpc(mainWindow, referencesObj);
+  setMainIpc(mainWindow);
   // and load the index.html of the app.
   mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
 
@@ -46,7 +46,8 @@ app.on('ready', createWindow);
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-  referencesObj.saveReference();
+  const insAPI = ReferenceAPI.getInstance();
+  insAPI.saveReference();
   if (process.platform !== 'darwin') {
     app.quit();
   }
