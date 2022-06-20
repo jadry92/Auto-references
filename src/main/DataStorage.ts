@@ -40,7 +40,7 @@ class DataStorage {
 
   private generateID = (): string => {
     let uuid = crypto.randomUUID();
-    while (!Object.keys(this.data).includes(uuid)) {
+    while (Object.keys(this.data).includes(uuid)) {
       uuid = crypto.randomUUID();
     }
     return uuid;

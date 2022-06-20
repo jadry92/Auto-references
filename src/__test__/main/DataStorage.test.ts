@@ -2,34 +2,54 @@
 This suit test the data storage functionality of the application.
 
 */
-import DataStorage, { ReferenceData } from '../../main/DataStorage';
+import DataStorage, { ReferenceData, refStatus } from '../../main/DataStorage';
 
-describe.skip('This suit test the data storage functionality of the application.', () => {
+describe('This suit test the data storage functionality of the application.', () => {
   const dataStorage = DataStorage.getInstance();
-  const link = `https://www.youtube.com/TRUE`;
-  const linkWrong = `https://www.youtube.com/FALSE`;
+  const URL = `https://www.youtube.com/TRUE`;
+  let dataExample_1 = {
+    id: '',
+    title: '',
+    authorName: '',
+    authorSurname: '',
+    visitDate: new Date().getFullYear().toString(),
+    yearPublish: '',
+    URL: URL,
+    status: <refStatus>'searching'
+  };
+  const URLWrong = `https://www.youtube.com/FALSE`;
+  const dataExample_2 = {
+    id: '',
+    title: '',
+    authorName: '',
+    authorSurname: '',
+    visitDate: new Date().getFullYear().toString(),
+    yearPublish: '',
+    URL: URLWrong,
+    status: <refStatus>'searching'
+  };
 
-  test('create Method', () => {
-    const response = dataStorage.create(link);
-
-    expect(response).toBeTruthy();
+  test('set Method', () => {
+    const response = dataStorage.setData(dataExample_1);
+    dataExample_1.id = response.id;
+    expect(response).toEqual(dataExample_1);
   });
 
-  test('create method error', () => {
-    const response = dataStorage.create(link);
-
-    expect(response).toBeFalsy();
+  test('set method error', () => {
+    const response = dataStorage.setData(dataExample_1);
+    expect(response).toBeNull();
   });
 
   test('Get Method', () => {
-    const data = dataStorage.getData(link);
+    const data = dataStorage.getData(dataExample_1.id);
     const expected = {
+      id: dataExample_1.id,
       title: '',
       authorName: '',
       authorSurname: '',
       visitDate: new Date().getFullYear().toString(),
       yearPublish: '',
-      URL: link,
+      URL: URL,
       status: 'searching'
     };
 
@@ -37,13 +57,14 @@ describe.skip('This suit test the data storage functionality of the application.
   });
 
   test('Get Method Error', () => {
-    const data = dataStorage.getData(linkWrong);
-    const expected: ReferenceData = null;
-    expect(data).toEqual(expected);
+    const data = dataStorage.getData('asjhdgajshgd');
+
+    expect(data).toBeNull();
   });
 
-  test('setData Method', () => {
+  test('Put Data Method', () => {
     const data: ReferenceData = {
+      id: dataExample_1.id,
       title: 'Test YouTube',
       authorName: 'title test',
       authorSurname: 'title test',
@@ -53,13 +74,14 @@ describe.skip('This suit test the data storage functionality of the application.
       status: 'wrong-data'
     };
 
-    const response = dataStorage.setData(link, data);
+    dataExample_1 = dataStorage.putDataID(data);
 
-    expect(response).toBeTruthy();
+    expect(dataExample_1).toEqual(data);
   });
 
-  test('setData Method Error', () => {
+  test('Put Data Method Error', () => {
     const data: ReferenceData = {
+      id: 'adsda',
       title: 'Test YouTube',
       authorName: 'title test',
       authorSurname: 'title test',
@@ -69,37 +91,23 @@ describe.skip('This suit test the data storage functionality of the application.
       status: 'wrong-data'
     };
 
-    const response = dataStorage.setData(linkWrong, data);
+    const response = dataStorage.putDataID(data);
 
-    expect(response).toBeFalsy();
+    expect(response).toBeNull();
   });
 
-  test.todo('enable editing');
-
-  test('Update Functionality with the set Method', () => {
-    const data: ReferenceData = {
-      title: 'Test YouTube',
-      authorName: 'name',
-      authorSurname: 'surname',
-      visitDate: '2021',
-      yearPublish: '2021',
-      URL: 'https://www.youtube.com/TRUE',
-      status: 'ready'
+  test('Patch Data Method', () => {
+    const data = {
+      title: 'new title YouTube'
     };
 
-    const response = dataStorage.setData(link, data);
-
-    expect(response).toBeTruthy();
-
-    const dataResponse = dataStorage.getData(link);
-
-    expect(dataResponse).toEqual(data);
+    const response = dataStorage.patchDataID(dataExample_1.id, data);
+    dataExample_1.title = 'new title YouTube';
+    expect(response).toEqual(dataExample_1);
   });
 
   test('Remove Method', () => {
-    const link = `https://www.youtube.com/watch?v=2tUu_zRhPMg`;
-
-    const response = dataStorage.remove(link);
+    const response = dataStorage.deleteData(dataExample_1.id);
 
     expect(response).toBeTruthy();
   });
@@ -107,7 +115,7 @@ describe.skip('This suit test the data storage functionality of the application.
   test('Remove Method Error', () => {
     const link = `https://www.youtube.com/`;
 
-    const response = dataStorage.remove(link);
+    const response = dataStorage.deleteData(link);
 
     expect(response).toBeFalsy();
   });
