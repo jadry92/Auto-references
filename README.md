@@ -48,3 +48,5 @@ If you are improving the application you can run the unit test using the command
 ```bash
 npm run test
 ```
+
+The testing is only for main backend at the moment
