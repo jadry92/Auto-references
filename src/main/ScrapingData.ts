@@ -126,7 +126,6 @@ class ScrapingData {
         this.getData(dom);
       }
     }
-
     return this.data;
   };
 

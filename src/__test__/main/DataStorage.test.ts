@@ -30,9 +30,28 @@ describe('This suit test the data storage functionality of the application.', ()
   };
 
   test('set Method', () => {
-    const response = dataStorage.setData(dataExample_1);
-    dataExample_1.id = response.id;
-    expect(response).toEqual(dataExample_1);
+    const response_1 = dataStorage.setData(dataExample_1);
+    dataExample_1.id = response_1.id;
+    expect(response_1).toEqual(dataExample_1);
+    const response_2 = dataStorage.setData(dataExample_2);
+    dataExample_2.id = response_2.id;
+    expect(response_2).toEqual(dataExample_2);
+  });
+
+  test('set Method random', () => {
+    const data = {
+      id: '',
+      title: '',
+      authorName: '',
+      authorSurname: '',
+      visitDate: new Date().getFullYear().toString(),
+      yearPublish: '',
+      URL: URLWrong,
+      status: <refStatus>'searching'
+    };
+    for (let index = 0; index < 20; index++) {
+      const response = dataStorage.setData(data);
+    }
   });
 
   test('set method error', () => {

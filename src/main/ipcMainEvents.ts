@@ -23,11 +23,8 @@ function copyClipboard(event: IpcMainEvent, text: string): void {
 }
 
 function setMainIpc(mainWindow: BrowserWindow): void {
-  const insAPI = ReferenceAPI.getInstance();
-  ipcMain.on('get-reference', insAPI.getReference);
-  ipcMain.on('update-reference', insAPI.updateReference);
-  ipcMain.on('delete-reference', insAPI.deleteReference);
-  ipcMain.on('process-url', insAPI.processURL);
+  const insAPI = new ReferenceAPI();
+  ipcMain.on('on-error', errorDialogInterface);
   ipcMain.on('error-dialog', errorDialogInterface);
   ipcMain.on('copy-clipboard', copyClipboard);
   ipcMain.on('notify', (_, message) => {

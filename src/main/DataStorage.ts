@@ -39,9 +39,9 @@ class DataStorage {
   }
 
   private generateID = (): string => {
-    let uuid = crypto.randomUUID();
+    let uuid = crypto.randomBytes(32).toString('hex');
     while (Object.keys(this.data).includes(uuid)) {
-      uuid = crypto.randomUUID();
+      uuid = crypto.randomBytes(32).toString('hex');
     }
     return uuid;
   };
@@ -95,8 +95,7 @@ class DataStorage {
   public setData = (reference: ReferenceData): ReferenceData => {
     if (reference.id === '') {
       const id = this.generateID();
-      reference.id = id;
-      this.data[id] = reference;
+      this.data[id] = { ...reference, id: id };
       return this.data[id];
     }
     return null;
@@ -109,6 +108,10 @@ class DataStorage {
     } else {
       return false;
     }
+  };
+
+  public getAll = (): ReferenceData[] => {
+    return Object.values(this.data);
   };
 }
 

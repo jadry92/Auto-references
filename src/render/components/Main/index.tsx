@@ -30,26 +30,6 @@ class OlMain extends React.Component<IProps, IState> {
     };
   }
 
-  public onUrlChange = (
-    event: IpcRendererEvent,
-    oldLink: string,
-    newLink: string,
-    action: string,
-    status: boolean
-  ): void => {
-    if (status) {
-      if (action === 'change-url-search') {
-        this.dropReference(oldLink);
-        this.addLink(newLink);
-        window.electron.dataAPI.processLink(newLink);
-      } else if (action === 'change-url-edit') {
-        this.dropReference(oldLink);
-        this.addLink(newLink);
-        window.electron.dataAPI.getReference(newLink);
-      }
-    }
-  };
-
   onChangeReference = (
     event: IpcRendererEvent,
     link: string,
@@ -117,47 +97,25 @@ class OlMain extends React.Component<IProps, IState> {
       this.setState({ listReferences: [referencesReceived] });
     }
   };
-
-  // Text box actions
-
-  restSearch = (event: MouseEvent): void => {
-    event.preventDefault();
-    // This function reset the app to initial stage
-  };
-
-  clearBox = (event: MouseEvent): void => {
-    event.preventDefault();
-    // This function clean the text box
-    this.setState({
-      listReferences: undefined,
-      listOfLinks: undefined
-    });
-  };
-
-  setLinksFromTextBox = (listOfLinks: Set<string>): void => {
-    if (listOfLinks) {
-      listOfLinks.forEach((link) => {
-        window.electron.dataAPI.processLink(link);
-      });
-      this.setState({
-        listOfLinks: listOfLinks
-      });
-    } else {
-      console.log('error no links in listOfLinks');
-    }
-  };
-
-  // Update form handler
 }
 
 function Main(): JSX.Element {
   const [listReferences, setListReferences] = useState<ReferenceData[]>();
 
-  // ICP communication
-  const setIpc = (): void => {
-    //window.electron.onEventsAPI.onProcessLinkReady(requestData);
-    //window.electron.onEventsAPI.onReferenceReady();
+  const addReference = (event: IpcRendererEvent, refData: ReferenceData) => {
+    const allReferences = [...listReferences];
+    allReferences.push(refData);
+    console.log(refData, 'here');
+    setListReferences(allReferences);
   };
+  // ICP communication
+
+  window.electron.onEventsAPI.onProcessURLReady(addReference);
+  window.electron.onEventsAPI.onReferenceReady(
+    (event: IpcRendererEvent, data: string) => {
+      console.log(`a msg from the back ${data}`);
+    }
+  );
 
   const copyClipBoard = (): void => {
     let text = '';

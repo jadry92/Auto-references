@@ -1,5 +1,4 @@
 import { app, BrowserWindow } from 'electron';
-import ReferenceAPI from './main/ReferenceAPI';
 import setMainIpc from './main/ipcMainEvents';
 import dotenv from 'dotenv';
 
@@ -24,8 +23,6 @@ const createWindow = (): void => {
     }
   });
 
-  // Creating the Reference Obj
-
   // Set communication IPC
   setMainIpc(mainWindow);
   // and load the index.html of the app.
@@ -46,8 +43,6 @@ app.on('ready', createWindow);
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-  const insAPI = ReferenceAPI.getInstance();
-  insAPI.saveReference();
   if (process.platform !== 'darwin') {
     app.quit();
   }

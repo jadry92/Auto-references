@@ -8,51 +8,55 @@ Author: Johan Suarez Largo
 import { IpcMainEvent, IpcMainInvokeEvent } from 'electron/main';
 import DataStorage, { ReferenceData } from './DataStorage';
 import ScrapingData from './ScrapingData';
+import { ipcMain } from 'electron';
 
 class ReferenceAPI {
   private static API: ReferenceAPI;
   private dataStorage: DataStorage;
 
-  private constructor() {
+  constructor() {
     this.dataStorage = DataStorage.getInstance();
+    ipcMain.on('get-reference', this.getReference);
+    ipcMain.on('update-reference', this.updateReference);
+    ipcMain.on('delete-reference', this.deleteReference);
+    ipcMain.on('process-URL', this.processURL);
   }
 
-  public static getInstance(): ReferenceAPI {
-    if (!ReferenceAPI.API) {
-      ReferenceAPI.API = new ReferenceAPI();
-    }
-    return ReferenceAPI.API;
-  }
-
-  public processURL = (event: IpcMainEvent, URL: string): void => {
+  private processURL = (event: IpcMainEvent, URL: string): void => {
     const scrapingData = new ScrapingData(URL);
+
     scrapingData
       .parsingReference()
       .then((dataReference) => {
-        this.dataStorage.setData(dataReference);
-        event.sender.send('process-URL-ready');
+        const dbReference = this.dataStorage.setData(dataReference);
+        event.sender.send('process-URL-ready', dbReference);
       })
       .catch((error) => {
+        console.log(error);
         event.sender.send('on-error', error);
       });
+    event.sender.send('get-reference-ready', 'dsadasd');
   };
 
-  public getReference = (event: IpcMainEvent, id: string): void => {
+  private getReference = (event: IpcMainEvent, id: string): void => {
     const query = this.dataStorage.getData(id);
     event.sender.send('get-reference-ready', query);
   };
 
-  public updateReference = (event: IpcMainEvent, data: ReferenceData): void => {
+  private updateReference = (
+    event: IpcMainEvent,
+    data: ReferenceData
+  ): void => {
     const result = this.dataStorage.putDataID(data);
     event.sender.send('on-change-reference', 'update', result);
   };
 
-  public deleteReference = (event: IpcMainEvent, id: string): void => {
+  private deleteReference = (event: IpcMainEvent, id: string): void => {
     const result = this.dataStorage.deleteData(id);
     event.sender.send('on-change-reference', 'delete', result);
   };
 
-  public partialUpdate = (
+  private partialUpdate = (
     event: IpcMainEvent,
     id: string,
     data: Partial<ReferenceData>
@@ -61,7 +65,7 @@ class ReferenceAPI {
     event.sender.send('on-change-reference', 'partialUpdate', result);
   };
 
-  public saveReference = (): void => {
+  private saveReference = (): void => {
     this.dataStorage.save();
   };
 }

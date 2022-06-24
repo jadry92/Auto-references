@@ -1,28 +1,25 @@
 // components
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AutoTextArea from './AutoTextArea';
 import imgDrop from '../assets/img/expand_more_black_24dp.svg';
 import '../assets/styles/textbox.css';
 
-// interfaces
-interface handelEventFunc {
-  (event: any): void;
-}
-
-const cleanData = (rawURLs: string[]): string[] => {
+const cleanURLs = (rawURLs: string[]): string[] => {
   // check if the links a correct, use regular expressions predefine
 
   const wellURL = /^https?:\/\/.+$/g;
   const normalURL = /^w?w?w?\.?.*\.[a-z]{2,5}\/[\w/]{1,}/g;
-  rawURLs.filter((str) => str != '');
+  const URLs = rawURLs
+    .map((str) => str.replace(/ /g, ''))
+    .filter((str) => str !== '');
 
-  return rawURLs.map((URL) => {
+  return URLs.map((URL) => {
     if (URL.match(wellURL)) {
       return URL;
     } else if (URL.match(normalURL)) {
       return 'http://' + URL;
     } else {
-      console.log('invalid link ' + URL);
+      console.log('invalid' + URL);
     }
   });
 };
@@ -30,10 +27,10 @@ const cleanData = (rawURLs: string[]): string[] => {
 function TextBox(): JSX.Element {
   const [itWasSent, setItWasSent] = useState(false);
   const [isTextBoxHidden, setIsTextBoxHidden] = useState(false);
-  const [errorMsg, setErrorMsg] = useState<string>();
-  const [textBoxValue, setTextBoxValue] = useState<string>();
-  const [numberOfURLs, setNumberOfURLs] = useState<number>();
-  const [numberOfURLsValidated, setNumberOfURLsValidated] = useState<number>();
+  const [errorMsg, setErrorMsg] = useState<string>('');
+  const [textBoxValue, setTextBoxValue] = useState<string>('');
+  const [numberOfURLs, setNumberOfURLs] = useState<number>(0);
+  const [numberOfURLsValidated, setNumberOfURLsValidated] = useState<number>(0);
 
   const handelChangeTextBox = (
     event: React.ChangeEvent<HTMLTextAreaElement>
@@ -43,7 +40,12 @@ function TextBox(): JSX.Element {
   };
 
   const handelBoxClear = (event: React.FormEvent) => {
-    console.log('cleare');
+    event.preventDefault();
+    setIsTextBoxHidden(false);
+    setErrorMsg('');
+    setTextBoxValue('');
+    setNumberOfURLs(0);
+    setNumberOfURLsValidated(0);
   };
 
   const toggleHidden = (): void => {
@@ -53,12 +55,12 @@ function TextBox(): JSX.Element {
   const summitURLs = (event: React.FormEvent): void => {
     event.preventDefault();
     const URLsRaw = textBoxValue.split('\n');
-    const setURLs = new Set(cleanData(URLsRaw));
+    const setURLs = new Set(cleanURLs(URLsRaw));
     const listOfURLs = Array.from(setURLs);
 
     if (listOfURLs.length !== 0) {
       listOfURLs.forEach((URL) => {
-        window.electron.dialogAPI.processURL(URL);
+        window.electron.dataAPI.processURL(URL);
       });
       setNumberOfURLs(URLsRaw.length);
       setNumberOfURLsValidated(listOfURLs.length);
@@ -70,6 +72,15 @@ function TextBox(): JSX.Element {
       window.electron.dialogAPI.errorDialog('Wrong Link/s', message);
     }
   };
+
+  useEffect(() => {
+    setTextBoxValue(`
+    https://www.flase-domaion.com
+    https://lucybain.com/blog/2017/react-js-when-to-rerender/
+    https://www.youtube.com/watch?v=2tUu_zRhPMg
+    https://en.wikipedia.org/wiki/Internet
+    https://www.accc.gov.au/system/files/20-47RPT_Communications_Market_Report_FA.pdf`);
+  }, []);
 
   return (
     <React.Fragment>
