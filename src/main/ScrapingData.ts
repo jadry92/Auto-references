@@ -1,7 +1,7 @@
 import { HTMLElement, parse } from 'node-html-parser';
 import { ReferenceData, refStatus } from './DataStorage';
 import fetch from 'node-fetch';
-import { testInternetConnection } from './utils';
+import { testInternetConnection, validInformation } from './utils';
 import { dialog } from 'electron';
 
 const titleRegex = /^.+\s[|\-.]\s([\w\s]{4,30})$/g;
@@ -49,7 +49,7 @@ class ScrapingData {
       }
     });
 
-    this.data.status = this.validInformation(this.data);
+    this.data.status = validInformation(this.data);
   };
 
   private getData = (dom: HTMLElement): void => {
@@ -81,7 +81,7 @@ class ScrapingData {
     this.data.visitDate = objDate.getFullYear().toString();
     this.data.yearPublish = '';
 
-    this.data.status = this.validInformation(this.data);
+    this.data.status = validInformation(this.data);
   };
 
   private getDataWiki = (dom: HTMLElement): void => {
@@ -109,7 +109,7 @@ class ScrapingData {
     this.data.yearPublish =
       lastModText != '' ? lastModText.match(yearRegex)[0] : '';
 
-    this.data.status = this.validInformation(this.data);
+    this.data.status = validInformation(this.data);
   };
 
   public parsingReference = async (): Promise<ReferenceData> => {
@@ -147,17 +147,5 @@ class ScrapingData {
     }
     return dom;
   };
-
-  public validInformation(data: ReferenceData): refStatus {
-    if (!data.yearPublish.match(yearRegex)) {
-      return 'wrong-data';
-    } else if (data.authorName === '' || data.authorSurname === '') {
-      return 'wrong-data';
-    } else if (data.title === '') {
-      return 'wrong-data';
-    } else {
-      return 'ready';
-    }
-  }
 }
 export default ScrapingData;

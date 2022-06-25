@@ -1,20 +1,17 @@
 import React, { useState } from 'react';
 import { ReferenceData } from '../../main/DataStorage';
 
-interface handelEventFunc {
-  (event: any, index: number): void;
-}
-
 interface IProps {
-  data?: ReferenceData;
+  reference?: ReferenceData;
   index?: number;
 }
 
-const ReferenceForm = ({ data }: IProps): JSX.Element => {
-  const [title, setTitle] = useState(data.title);
-  const [authorName, setAuthorName] = useState(data.authorName);
-  const [authorSurname, setAuthorSurname] = useState(data.authorSurname);
-  const [yearPublish, setYearPublish] = useState(data.yearPublish);
+const ReferenceForm = ({ reference }: IProps): JSX.Element => {
+  const [title, setTitle] = useState(reference.title);
+  const [authorName, setAuthorName] = useState(reference.authorName);
+  const [authorSurname, setAuthorSurname] = useState(reference.authorSurname);
+  const [yearPublish, setYearPublish] = useState(reference.yearPublish);
+  const [URL, setURL] = useState(reference.URL);
 
   const handelChangeForm = (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -25,24 +22,23 @@ const ReferenceForm = ({ data }: IProps): JSX.Element => {
 
   const handelDeleteRef = (event: React.FormEvent) => {
     event.preventDefault();
-    window.electron.dataAPI.deleteReference(data.URL);
+    window.electron.dataAPI.deleteReference(reference.id);
+    console.log('delete', reference.id);
   };
 
   const handelSaveForm = (event: React.FormEvent) => {
     event.preventDefault();
-    const updateRef = data;
+    const updateRef = { ...reference };
     updateRef.title = title;
     updateRef.authorName = authorName;
     updateRef.authorSurname = authorSurname;
     updateRef.yearPublish = yearPublish;
-    window.electron.dataAPI.updateReference(data.URL, updateRef);
+    updateRef.URL = URL;
+    window.electron.dataAPI.updateReference(updateRef);
   };
 
   return (
     <div className="row">
-      <div className="col s12">
-        <p className="grey-text">{data.URL}</p>
-      </div>
       <form
         action=""
         id="ref_form"
@@ -95,6 +91,19 @@ const ReferenceForm = ({ data }: IProps): JSX.Element => {
               value={yearPublish}
               onChange={(e) => handelChangeForm(e, setYearPublish)}
               id="yearPublish"
+              placeholder="Year Publish"
+            />
+          </div>
+        </div>
+        <div className="row">
+          <div className="col s12">
+            <input
+              type="text"
+              name="URL"
+              className={URL !== '' ? `valid` : `invalid`}
+              value={URL}
+              onChange={(e) => handelChangeForm(e, setURL)}
+              id="URL"
               placeholder="Year Publish"
             />
           </div>
