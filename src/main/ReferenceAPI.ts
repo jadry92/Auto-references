@@ -5,7 +5,7 @@ the events related with the Auto Reference logic
 Author: Johan Suarez Largo
 */
 
-import { IpcMainEvent, IpcMainInvokeEvent } from 'electron/main';
+import { IpcMainEvent } from 'electron/main';
 import DataStorage, { ReferenceData } from './DataStorage';
 import ScrapingData from './ScrapingData';
 import { ipcMain } from 'electron';
@@ -34,7 +34,6 @@ class ReferenceAPI {
         event.sender.send('process-URL-ready', dbReference);
       })
       .catch((error) => {
-        console.log(error);
         event.sender.send('on-error', error);
       });
   };

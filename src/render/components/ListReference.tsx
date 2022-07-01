@@ -1,30 +1,28 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { ReferenceData } from '../../main/DataStorage';
 import Loader from './Loader';
 import Reference from './Reference';
 import ReferenceForm from './ReferenceForm';
-import UrlForm from './UrlForm';
 import { ListReferences } from './Main';
+
 // interfaces
 interface IProps {
   listReferences: ListReferences;
 }
 
-interface IState {}// eslint-disable-line
-
 // Component
 
 function ListReference(props: IProps): JSX.Element {
-  const switchStatus = (item: ReferenceData, index: number): JSX.Element => {
+  const switchStatus = (item: ReferenceData): JSX.Element => {
     switch (item.status) {
       case 'ready':
-        return <Reference index={index} reference={item} />;
+        return <Reference reference={item} />;
       case 'editing':
-        return <ReferenceForm index={index} reference={item} />;
+        return <ReferenceForm reference={item} />;
       case 'wrong-data':
-        return <ReferenceForm index={index} reference={item} />;
+        return <ReferenceForm reference={item} />;
       case 'wrong-link':
-        return <ReferenceForm index={index} reference={item} />;
+        return <ReferenceForm reference={item} />;
       case 'searching':
         return <Loader />;
       default:
@@ -36,8 +34,8 @@ function ListReference(props: IProps): JSX.Element {
     <div>
       <ul>
         {arrayReferences
-          ? arrayReferences.map((item, index) => (
-              <li key={item.URL}>{switchStatus(item, index)}</li>
+          ? arrayReferences.map((item) => (
+              <li key={item.id}>{switchStatus(item)}</li>
             ))
           : null}
       </ul>

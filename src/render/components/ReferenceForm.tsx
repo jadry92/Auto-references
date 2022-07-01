@@ -3,7 +3,6 @@ import { ReferenceData } from '../../main/DataStorage';
 
 interface IProps {
   reference?: ReferenceData;
-  index?: number;
 }
 
 const ReferenceForm = ({ reference }: IProps): JSX.Element => {
@@ -23,7 +22,6 @@ const ReferenceForm = ({ reference }: IProps): JSX.Element => {
   const handelDeleteRef = (event: React.FormEvent) => {
     event.preventDefault();
     window.electron.dataAPI.deleteReference(reference.id);
-    console.log('delete', reference.id);
   };
 
   const handelSaveForm = (event: React.FormEvent) => {

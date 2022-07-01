@@ -2,7 +2,6 @@ import { HTMLElement, parse } from 'node-html-parser';
 import { ReferenceData, refStatus } from './DataStorage';
 import fetch from 'node-fetch';
 import { testInternetConnection, validInformation } from './utils';
-import { dialog } from 'electron';
 
 const titleRegex = /^.+\s[|\-.]\s([\w\s]{4,30})$/g;
 const yearRegex = /\d\d\d\d/g;

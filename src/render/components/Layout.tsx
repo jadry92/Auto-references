@@ -1,35 +1,31 @@
 import React from 'react';
 
 interface IProps {
-  children: any;
+  children: React.ReactNode;
 }
 
-interface IState {}// eslint-disable-line
-
-class Layout extends React.Component<IProps, IState> {
-  render(): JSX.Element {
-    return (
-      <React.Fragment>
-        {this.props.children}
-        <footer className="page-footer">
-          <div className="footer-copyright">
-            <a
-              className="grey-text text-lighten-4 left"
-              href="https://github.com/jadry92/Auto-references/blob/master/LICENSE"
-            >
-              MIT License
-            </a>
-            <a
-              className="grey-text text-lighten-4 right"
-              href="https://github.com/jadry92/Auto-references"
-            >
-              Github Rep
-            </a>
-          </div>
-        </footer>
-      </React.Fragment>
-    );
-  }
+function Layout({ children }: IProps): JSX.Element {
+  return (
+    <React.Fragment>
+      {children}
+      <footer className="page-footer">
+        <div className="footer-copyright">
+          <a
+            className="grey-text text-lighten-4 left"
+            href="https://github.com/jadry92/Auto-references/blob/master/LICENSE"
+          >
+            MIT License
+          </a>
+          <a
+            className="grey-text text-lighten-4 right"
+            href="https://github.com/jadry92/Auto-references"
+          >
+            Github Rep
+          </a>
+        </div>
+      </footer>
+    </React.Fragment>
+  );
 }
 
 export default Layout;
