@@ -1,61 +1,46 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { ReferenceData } from '../../main/DataStorage';
 import Loader from './Loader';
 import Reference from './Reference';
 import ReferenceForm from './ReferenceForm';
-import UrlForm from './UrlForm';
+import { ListReferences } from './Main';
 
 // interfaces
-
-interface handelEventFunc {
-  (event: any): void;
-}
-
 interface IProps {
-  listReferences?: ReferenceData[];
+  listReferences: ListReferences;
 }
-
-interface IState {}// eslint-disable-line
 
 // Component
 
-class ListReference extends Component<IProps, IState> {
-  constructor(props: IProps) {
-    super(props);
-  }
-
-  private switchStatus = (item: ReferenceData, index: number): JSX.Element => {
+function ListReference(props: IProps): JSX.Element {
+  const switchStatus = (item: ReferenceData): JSX.Element => {
     switch (item.status) {
       case 'ready':
-        return <Reference index={index} data={item} />;
+        return <Reference reference={item} />;
       case 'editing':
-        return <ReferenceForm index={index} data={item} />;
+        return <ReferenceForm reference={item} />;
       case 'wrong-data':
-        return <ReferenceForm index={index} data={item} />;
+        return <ReferenceForm reference={item} />;
       case 'wrong-link':
-        return <UrlForm index={index} data={item} />;
+        return <ReferenceForm reference={item} />;
       case 'searching':
         return <Loader />;
       default:
         return <h2>Error!!</h2>;
     }
   };
-
-  render(): JSX.Element {
-    const { listReferences } = this.props;
-
-    return (
-      <div>
-        <ul>
-          {listReferences
-            ? listReferences.map((item, index) => (
-                <li key={item.URL}>{this.switchStatus(item, index)}</li>
-              ))
-            : null}
-        </ul>
-      </div>
-    );
-  }
+  const arrayReferences = Object.values(props.listReferences);
+  return (
+    <div>
+      <ul>
+        {arrayReferences
+          ? arrayReferences.map((item) => (
+              <li key={item.id}>{switchStatus(item)}</li>
+            ))
+          : null}
+      </ul>
+    </div>
+  );
 }
 
 export default ListReference;

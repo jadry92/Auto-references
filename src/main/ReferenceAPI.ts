@@ -5,10 +5,11 @@ the events related with the Auto Reference logic
 Author: Johan Suarez Largo
 */
 
-import { IpcMainEvent, IpcMainInvokeEvent } from 'electron/main';
+import { IpcMainEvent } from 'electron/main';
 import DataStorage, { ReferenceData } from './DataStorage';
 import ScrapingData from './ScrapingData';
 import { ipcMain } from 'electron';
+import { validInformation } from './utils';
 
 class ReferenceAPI {
   private static API: ReferenceAPI;
@@ -20,6 +21,7 @@ class ReferenceAPI {
     ipcMain.on('update-reference', this.updateReference);
     ipcMain.on('delete-reference', this.deleteReference);
     ipcMain.on('process-URL', this.processURL);
+    ipcMain.on('partial-update-reference', this.partialUpdate);
   }
 
   private processURL = (event: IpcMainEvent, URL: string): void => {
@@ -32,10 +34,8 @@ class ReferenceAPI {
         event.sender.send('process-URL-ready', dbReference);
       })
       .catch((error) => {
-        console.log(error);
         event.sender.send('on-error', error);
       });
-    event.sender.send('get-reference-ready', 'dsadasd');
   };
 
   private getReference = (event: IpcMainEvent, id: string): void => {
@@ -47,13 +47,14 @@ class ReferenceAPI {
     event: IpcMainEvent,
     data: ReferenceData
   ): void => {
+    data.status = validInformation(data);
     const result = this.dataStorage.putDataID(data);
-    event.sender.send('on-change-reference', 'update', result);
+    event.sender.send('on-change-reference', 'update', result.id, result);
   };
 
   private deleteReference = (event: IpcMainEvent, id: string): void => {
     const result = this.dataStorage.deleteData(id);
-    event.sender.send('on-change-reference', 'delete', result);
+    event.sender.send('on-change-reference', 'delete', id, result);
   };
 
   private partialUpdate = (
@@ -62,7 +63,7 @@ class ReferenceAPI {
     data: Partial<ReferenceData>
   ): void => {
     const result = this.dataStorage.patchDataID(id, data);
-    event.sender.send('on-change-reference', 'partialUpdate', result);
+    event.sender.send('on-change-reference', 'partial-update', id, result);
   };
 
   private saveReference = (): void => {

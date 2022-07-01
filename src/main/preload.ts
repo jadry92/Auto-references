@@ -9,19 +9,9 @@ interface callbackOn {
 interface onChangeReferenceCallback {
   (
     event: IpcRendererEvent,
-    link: string,
     action: string,
-    status: boolean
-  ): void;
-}
-
-interface onChangeUrlCallback {
-  (
-    event: IpcRendererEvent,
-    oldLink: string,
-    newLink: string,
-    action: string,
-    status: boolean
+    id: string,
+    result: ReferenceData | boolean
   ): void;
 }
 
@@ -44,23 +34,17 @@ contextBridge.exposeInMainWorld('electron', {
     processURL(URL: string) {
       ipcRenderer.send('process-URL', URL);
     },
-    getReference(link: string) {
-      ipcRenderer.send('get-reference', link);
+    getReference(id: string) {
+      ipcRenderer.send('get-reference', id);
     },
-    updateReference(link: string, data: ReferenceData) {
-      ipcRenderer.send('update-reference', link, data);
+    updateReference(data: ReferenceData) {
+      ipcRenderer.send('update-reference', data);
     },
-    deleteReference(link: string) {
-      ipcRenderer.send('delete-reference', link);
+    partialUpdateReference(id: string, data: Partial<ReferenceData>) {
+      ipcRenderer.send('partial-update-reference', id, data);
     },
-    requestEditReference(link: string) {
-      ipcRenderer.send('request-edit-reference', link);
-    },
-    changeURLAndSearch(oldLink: string, newLink: string) {
-      ipcRenderer.send('change-url-and-search', oldLink, newLink);
-    },
-    changeURLAndEdit(oldLink: string, newLink: string) {
-      ipcRenderer.send('change-url-and-edit', oldLink, newLink);
+    deleteReference(id: string) {
+      ipcRenderer.send('delete-reference', id);
     },
     copyClipBoard(text: string) {
       ipcRenderer.send('copy-clipboard', text);
@@ -75,9 +59,6 @@ contextBridge.exposeInMainWorld('electron', {
     },
     onChangeReference(callbackFun: onChangeReferenceCallback) {
       ipcRenderer.on('on-change-reference', callbackFun);
-    },
-    onChangeUrl(callbackFun: onChangeUrlCallback) {
-      ipcRenderer.on('on-url-change', callbackFun);
     }
   }
 });

@@ -1,5 +1,5 @@
 // components
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import AutoTextArea from './AutoTextArea';
 import imgDrop from '../assets/img/expand_more_black_24dp.svg';
 import '../assets/styles/textbox.css';
@@ -19,7 +19,7 @@ const cleanURLs = (rawURLs: string[]): string[] => {
     } else if (URL.match(normalURL)) {
       return 'http://' + URL;
     } else {
-      console.log('invalid' + URL);
+      window.electron.dialogAPI.errorDialog('Wrong Link/s', URL);
     }
   });
 };
@@ -72,15 +72,6 @@ function TextBox(): JSX.Element {
       window.electron.dialogAPI.errorDialog('Wrong Link/s', message);
     }
   };
-
-  useEffect(() => {
-    setTextBoxValue(`
-    https://www.flase-domaion.com
-    https://lucybain.com/blog/2017/react-js-when-to-rerender/
-    https://www.youtube.com/watch?v=2tUu_zRhPMg
-    https://en.wikipedia.org/wiki/Internet
-    https://www.accc.gov.au/system/files/20-47RPT_Communications_Market_Report_FA.pdf`);
-  }, []);
 
   return (
     <React.Fragment>

@@ -38,22 +38,6 @@ describe('This suit test the data storage functionality of the application.', ()
     expect(response_2).toEqual(dataExample_2);
   });
 
-  test('set Method random', () => {
-    const data = {
-      id: '',
-      title: '',
-      authorName: '',
-      authorSurname: '',
-      visitDate: new Date().getFullYear().toString(),
-      yearPublish: '',
-      URL: URLWrong,
-      status: <refStatus>'searching'
-    };
-    for (let index = 0; index < 20; index++) {
-      const response = dataStorage.setData(data);
-    }
-  });
-
   test('set method error', () => {
     const response = dataStorage.setData(dataExample_1);
     expect(response).toBeNull();
