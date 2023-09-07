@@ -1,7 +1,6 @@
 # Auto References
 
-This is an Desktop APP which helps to create reference of Web Pages on APA format. This APP is build on Electron JS and React JS. Also, it's fully written on TypeScript.
-
+This is a Desktop APP that helps to create references of Web Pages in APA format. This APP is built on Electron JS and React JS. Also, it's fully written in TypeScript.
 App Stack:
 
 - React JS
@@ -11,25 +10,25 @@ App Stack:
 
 ## Usability
 
-The interface is very simple, a textarea for de links and two buttons "generate" and "clear".
+The interface is very simple, with a Textarea for the links and two buttons "generate" and "clear".
 
 ![Step 1](.statics/step-1.png)
 
-The first step is paste it all the links box
+The first step is to paste all the links box
 
 ![Step 2](.statics/step-3.png)
 
-Then, the generate the references:
+Then, it generates the references:
 
 ![Step 3](.statics/step-2.png)
 
-The app will scraping the necessary to generate reference from the more common web pages:
+The app will scrape the necessary to generate references from the more common web pages:
 
 - Wikipedia
 - Youtube
 - StackOverflow
 
-Use the "Copy" button to copy clipboard the references.
+Use the "Copy" button to copy the clipboard of the references.
 
 ## Installation process
 
@@ -49,4 +48,4 @@ If you are improving the application you can run the unit test using the command
 npm run test
 ```
 
-The testing is only for main backend at the moment
+The testing is only for the main backend at the moment
